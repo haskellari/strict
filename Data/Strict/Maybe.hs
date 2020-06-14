@@ -1,40 +1,81 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Strict.Maybe
 -- Copyright   :  (c) 2006-2007 Roman Leshchinskiy
+--                (c) 2013 Simon Meier
 -- License     :  BSD-style (see the file LICENSE)
--- 
--- Maintainer  :  Roman Leshchinskiy <rl@cse.unsw.edu.au>
+--
+-- Maintainer  :  Simon Meier <iridcode@gmail.com>
 -- Stability   :  experimental
--- Portability :  portable
+-- Portability :  GHC
 --
--- Strict @Maybe@.
+-- The strict variant of the standard Haskell 'L.Maybe' type and the
+-- corresponding variants of the functions from "Data.Maybe".
 --
--- Same as the standard Haskell @Maybe@, but @Just _|_ = _|_@
+-- Note that in contrast to the standard lazy 'L.Maybe' type, the strict
+-- 'Maybe' type is not an applicative functor, and therefore also not a monad.
+-- The problem is the /homomorphism/ law, which states that
 --
--- Note that strict @Maybe@ is not a monad since
--- @ return _|_ >>= f = _|_ @
--- which is not necessarily the same as @f _|_@.
+--      @'pure' f '<*>' 'pure' x = 'pure' (f x)  -- must hold for all f@
+--
+-- This law does not hold for the expected applicative functor instance of
+-- 'Maybe', as this instance does not satisfy @pure f \<*\> pure _|_ = pure (f
+-- _|_)@ for @f = const@.
 --
 -----------------------------------------------------------------------------
 
 module Data.Strict.Maybe (
     Maybe(..)
+  , toStrict, toLazy
   , isJust
   , isNothing
   , fromJust
   , fromMaybe
   , maybe
+  , listToMaybe
+  , maybeToList
+  , catMaybes
+  , mapMaybe
 ) where
 
-import Prelude hiding( Maybe(..), maybe )
+import           Prelude             hiding (Maybe (..), maybe)
+import qualified Prelude             as L
+
+import           Control.DeepSeq     (NFData (..))
+import           Data.Binary         (Binary (..))
+#if MIN_VERSION_base(4,7,0)
+import           Data.Data           (Data (..), Typeable)
+#else
+import           Data.Data           (Data (..), Typeable1 (..))
+#endif
+#if !MIN_VERSION_base(4,8,0)
+import           Control.Applicative (pure, (<$>))
+import           Data.Foldable       (Foldable (..))
+import           Data.Traversable    (Traversable (..))
+import           Data.Monoid         (Monoid (..))
+#endif
+#if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics        (Generic (..))
+#endif
+import           Data.Hashable       (Hashable(..))
+import           Data.Semigroup      (Semigroup)
+import qualified Data.Semigroup      as Semigroup
+
 
 -- | The type of strict optional values.
 data Maybe a = Nothing | Just !a deriving(Eq, Ord, Show, Read)
 
-instance Functor Maybe where
-  fmap _ Nothing  = Nothing
-  fmap f (Just x) = Just (f x)
+toStrict :: L.Maybe a -> Maybe a
+toStrict L.Nothing  = Nothing
+toStrict (L.Just x) = Just x
+
+toLazy :: Maybe a -> L.Maybe a
+toLazy Nothing  = L.Nothing
+toLazy (Just x) = L.Just x
 
 -- | Yields 'True' iff the argument is of the form @Just _@.
 isJust :: Maybe a -> Bool
@@ -66,3 +107,81 @@ maybe :: b -> (a -> b) -> Maybe a -> b
 maybe x _ Nothing  = x
 maybe _ f (Just y) = f y
 
+-- | Analogous to 'L.listToMaybe' in "Data.Maybe".
+listToMaybe :: [a] -> Maybe a
+listToMaybe []        =  Nothing
+listToMaybe (a:_)     =  Just a
+
+-- | Analogous to 'L.maybeToList' in "Data.Maybe".
+maybeToList :: Maybe a -> [a]
+maybeToList  Nothing   = []
+maybeToList  (Just x)  = [x]
+
+-- | Analogous to 'L.catMaybes' in "Data.Maybe".
+catMaybes :: [Maybe a] -> [a]
+catMaybes ls = [x | Just x <- ls]
+
+-- | Analogous to 'L.mapMaybe' in "Data.Maybe".
+mapMaybe :: (a -> Maybe b) -> [a] -> [b]
+mapMaybe _ []     = []
+mapMaybe f (x:xs) = case f x of
+    Nothing -> rs
+    Just r  -> r:rs
+  where
+    rs = mapMaybe f xs
+
+-- Instances
+------------
+
+deriving instance Data a => Data (Maybe a)
+#if MIN_VERSION_base(4,7,0)
+deriving instance Typeable Maybe
+#else
+deriving instance Typeable1 Maybe
+#endif
+
+#if __GLASGOW_HASKELL__ >= 706
+deriving instance Generic  (Maybe a)
+#endif
+
+instance Semigroup a => Semigroup (Maybe a) where
+  Nothing <> m       = m
+  m       <> Nothing = m
+  Just x1 <> Just x2 = Just (x1 Semigroup.<> x2)
+
+#if MIN_VERSION_base(4,11,0)
+instance Semigroup a => Monoid (Maybe a) where
+  mempty = Nothing
+#else
+instance Monoid a => Monoid (Maybe a) where
+  mempty = Nothing
+
+  Nothing `mappend` m       = m
+  m       `mappend` Nothing = m
+  Just x1 `mappend` Just x2 = Just (x1 `mappend` x2)
+#endif
+
+instance Functor Maybe where
+  fmap _ Nothing  = Nothing
+  fmap f (Just x) = Just (f x)
+
+instance Foldable Maybe where
+    foldMap _ Nothing  = mempty
+    foldMap f (Just x) = f x
+
+instance Traversable Maybe where
+    traverse _ Nothing  = pure Nothing
+    traverse f (Just x) = Just <$> f x
+
+-- deepseq
+instance NFData a => NFData (Maybe a) where
+  rnf = rnf . toLazy
+
+-- binary
+instance Binary a => Binary (Maybe a) where
+  put = put . toLazy
+  get = toStrict <$> get
+
+-- hashable
+instance Hashable a => Hashable (Maybe a) where
+  hashWithSalt salt = hashWithSalt salt . toLazy

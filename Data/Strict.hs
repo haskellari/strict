@@ -2,8 +2,9 @@
 -- |
 -- Module      :  Data.Strict
 -- Copyright   :  (c) 2006-2007 Roman Leshchinskiy
+--                (c) 2013 Simon Meier
 -- License     :  BSD-style (see the file LICENSE)
--- 
+--
 -- Maintainer  :  Roman Leshchinskiy <rl@cse.unsw.edu.au>
 -- Stability   :  experimental
 -- Portability :  portable
@@ -18,7 +19,6 @@ module Data.Strict (
   , module Data.Strict.Either
 ) where
 
-import Data.Strict.Tuple
-import Data.Strict.Maybe
-import Data.Strict.Either
-
+import Data.Strict.Tuple hiding (toStrict, toLazy)
+import Data.Strict.Maybe hiding (toStrict, toLazy)
+import Data.Strict.Either hiding (toStrict, toLazy)
