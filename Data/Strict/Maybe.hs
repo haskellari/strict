@@ -1,6 +1,10 @@
+#if __GLASGOW_HASKELL__ >= 608
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
+#endif
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -11,7 +15,7 @@
 --
 -- Maintainer  :  Simon Meier <iridcode@gmail.com>
 -- Stability   :  experimental
--- Portability :  GHC
+-- Portability :  portable
 --
 -- The strict variant of the standard Haskell 'L.Maybe' type and the
 -- corresponding variants of the functions from "Data.Maybe".
@@ -133,7 +137,9 @@ mapMaybe f (x:xs) = case f x of
 -- Instances
 ------------
 
+#if __GLASGOW_HASKELL__ >= 608
 deriving instance Data a => Data (Maybe a)
+#endif
 #if MIN_VERSION_base(4,7,0)
 deriving instance Typeable Maybe
 #else

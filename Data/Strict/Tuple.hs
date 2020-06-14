@@ -1,7 +1,15 @@
+#if __GLASGOW_HASKELL__ >= 608
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
+#endif
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
+#ifndef __HADDOCK__
+#ifdef __GLASGOW_HASKELL__
 {-# LANGUAGE TypeOperators      #-}
+#endif
+#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -12,7 +20,7 @@
 --
 -- Maintainer  :  Simon Meier <iridcode@gmail.com>
 -- Stability   :  experimental
--- Portability :  GHC
+-- Portability :  portable
 --
 -- The strict variant of the standard Haskell pairs and the corresponding
 -- variants of the functions from "Data.Tuple".
@@ -119,7 +127,9 @@ unzip x = ( map fst x
 -- Instances
 ------------
 
+#if __GLASGOW_HASKELL__ >= 608
 deriving instance (Data a, Data b) => Data (Pair a b)
+#endif
 #if MIN_VERSION_base(4,7,0)
 deriving instance Typeable Pair
 #else
