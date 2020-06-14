@@ -1,0 +1,32 @@
+Name:           strict
+Version:        0.3.2
+Synopsis:       Strict data types and String IO.
+Category:       Data, System
+Description:
+        This package provides strict versions of some standard Haskell data
+        types (pairs, Maybe and Either). It also contains strict IO
+        operations.
+License:        BSD3
+License-File:   LICENSE
+Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
+Maintainer:     Don Stewart <dons@galois.com>
+Copyright:      (c) 2006-2007 by Roman Leshchinskiy
+Homepage:       http://www.cse.unsw.edu.au/~rl/code/strict.html
+Cabal-Version: >= 1.2
+Build-type:     Simple
+
+flag split-base
+
+library
+  if flag(split-base)
+    build-depends:     base >= 3, array
+  else
+    build-depends:     base < 3
+  exposed-modules:
+        Data.Strict.Tuple
+        Data.Strict.Maybe
+        Data.Strict.Either
+        Data.Strict
+        System.IO.Strict
+  ghc-options:    -Wall
+  extensions:     CPP
