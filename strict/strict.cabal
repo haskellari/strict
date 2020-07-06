@@ -53,6 +53,7 @@ Copyright:      (c) 2006-2008 by Roman Leshchinskiy
 Homepage:       https://github.com/haskell-strict/strict
 Cabal-Version: >= 1.10
 Build-type:     Simple
+extra-source-files: CHANGELOG.md
 tested-with:
   GHC ==7.4.2
    || ==7.6.3
