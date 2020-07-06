@@ -180,9 +180,6 @@ instance Bifoldable Pair where
 
 instance Bitraversable Pair where
   bitraverse f g (a :!: b) = (:!:) <$> f a <*> g b
-#if !MIN_VERSION_bifunctors(5,1,0)
-  bisequenceA (a :!: b) = (:!:) <$> a <*> b
-#endif
 
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Pair a b) where

@@ -177,9 +177,6 @@ instance Bifoldable Either where
 instance Bitraversable Either where
   bitraverse f _ (Left a) = fmap Left (f a)
   bitraverse _ g (Right b) = fmap Right (g b)
-#if !MIN_VERSION_bifunctors(5,1,0)
-  bisequenceA = either (fmap Left) (fmap Right)
-#endif
 
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Either a b) where
