@@ -39,7 +39,7 @@ module Data.Strict.Tuple (
   , snd
   , curry
   , uncurry
-  , swap
+  , Data.Strict.Tuple.swap -- disambiguate
   , zip
   , unzip
 ) where
@@ -69,6 +69,11 @@ import           GHC.Generics        (Generic (..))
 #endif
 import           Data.Hashable       (Hashable(..))
 import           Data.Semigroup      (Semigroup (..))
+
+#ifdef MIN_VERSION_assoc
+import           Data.Bifunctor.Assoc (Assoc (..))
+import           Data.Bifunctor.Swap  (Swap (..))
+#endif
 
 #if __HADDOCK__
 import Data.Tuple ()
@@ -182,3 +187,13 @@ instance Bitraversable Pair where
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Pair a b) where
   hashWithSalt salt = hashWithSalt salt . toLazy
+
+-- assoc
+#ifdef MIN_VERSION_assoc
+instance Assoc Pair where
+    assoc ((a :!: b) :!: c) = (a :!: (b :!: c))
+    unassoc (a :!: (b :!: c)) = ((a :!: b) :!: c)
+
+instance Swap Pair where
+    swap = Data.Strict.Tuple.swap
+#endif
