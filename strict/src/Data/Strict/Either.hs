@@ -58,6 +58,10 @@ import           GHC.Generics        (Generic (..))
 #endif
 import           Data.Hashable       (Hashable(..))
 
+#ifdef MIN_VERSION_assoc
+import           Data.Bifunctor.Assoc (Assoc (..))
+import           Data.Bifunctor.Swap  (Swap (..))
+#endif
 
 -- | The strict choice type.
 data Either a b = Left !a | Right !b deriving(Eq, Ord, Read, Show)
@@ -179,3 +183,19 @@ instance Bitraversable Either where
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Either a b) where
   hashWithSalt salt = hashWithSalt salt . toLazy
+
+-- assoc
+#ifdef MIN_VERSION_assoc
+instance Assoc Either where
+    assoc (Left (Left a))  = Left a
+    assoc (Left (Right b)) = Right (Left b)
+    assoc (Right c)        = Right (Right c)
+
+    unassoc (Left a)          = Left (Left a)
+    unassoc (Right (Left b))  = Left (Right b)
+    unassoc (Right (Right c)) = Right c
+
+instance Swap Either where
+    swap (Left x) = Right x
+    swap (Right x) = Left x
+#endif

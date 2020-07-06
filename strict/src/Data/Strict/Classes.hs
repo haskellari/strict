@@ -4,7 +4,7 @@ module Data.Strict.Classes (
     Strict (..),
 ) where
 
-import Prelude (return, (.))
+import Prelude ((.))
 import qualified Prelude as L
 
 import Data.Strict.Tuple
@@ -58,7 +58,7 @@ instance Strict LBS.ByteString BS.ByteString where
   toLazy   = LBS.fromStrict
 #else
   toStrict = BS.concat . LBS.toChunks
-  toLazy   = LBS.fromChunks . return {- singleton -}
+  toLazy   = LBS.fromChunks . L.return {- singleton -}
 #endif
 
 instance Strict LT.Text T.Text where
