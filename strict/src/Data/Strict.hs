@@ -14,11 +14,13 @@
 -----------------------------------------------------------------------------
 
 module Data.Strict (
-    module Data.Strict.Tuple
+    module Data.Strict.Classes
+  , module Data.Strict.Tuple
   , module Data.Strict.Maybe
   , module Data.Strict.Either
 ) where
 
-import Data.Strict.Tuple hiding (toStrict, toLazy)
-import Data.Strict.Maybe hiding (toStrict, toLazy)
-import Data.Strict.Either hiding (toStrict, toLazy)
+import Data.Strict.Classes
+import Data.Strict.Tuple
+import Data.Strict.Maybe
+import Data.Strict.Either

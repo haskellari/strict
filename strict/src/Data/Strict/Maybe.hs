@@ -1,7 +1,6 @@
-#if __GLASGOW_HASKELL__ >= 608
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE StandaloneDeriving #-}
-#endif
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DeriveGeneric      #-}
 #endif
@@ -34,7 +33,6 @@
 
 module Data.Strict.Maybe (
     Maybe(..)
-  , toStrict, toLazy
   , isJust
   , isNothing
   , fromJust
