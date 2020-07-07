@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE Safe #-}
 {-# LANGUAGE StandaloneDeriving #-}
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DeriveGeneric      #-}
