@@ -35,7 +35,14 @@ module Data.Strict.Either (
   , partitionEithers
 ) where
 
-import           Prelude             hiding (Either (..), either)
+-- import parts explicitly, helps with compatibility
+import           Prelude (Functor (..), Eq, Ord, Show, Read, Bool (..), (.), error)
+import           Control.Applicative (pure, (<$>))
+import           Data.Semigroup (Semigroup (..))
+import           Data.Foldable (Foldable (..))
+import           Data.Traversable (Traversable (..))
+
+-- Lazy variants
 import qualified Prelude             as L
 
 import           Control.DeepSeq     (NFData (..))
@@ -43,21 +50,17 @@ import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
 import           Data.Binary         (Binary (..))
 import           Data.Bitraversable  (Bitraversable (..))
+import           Data.Hashable       (Hashable(..))
+
 #if MIN_VERSION_base(4,7,0)
 import           Data.Data           (Data (..), Typeable)
 #else
 import           Data.Data           (Data (..), Typeable2 (..))
 #endif
-#if !MIN_VERSION_base(4,8,0)
-import           Control.Applicative (pure, (<$>))
-import           Data.Foldable       (Foldable (..))
-import           Data.Traversable    (Traversable (..))
-import           Data.Monoid         (Monoid (..))
-#endif
+
 #if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics        (Generic (..))
 #endif
-import           Data.Hashable       (Hashable(..))
 
 #ifdef MIN_VERSION_assoc
 import           Data.Bifunctor.Assoc (Assoc (..))
@@ -116,7 +119,7 @@ rights x = [a | Right a <- x]
 -- | Analogous to 'L.partitionEithers' in "Data.Either".
 partitionEithers :: [Either a b] -> ([a],[b])
 partitionEithers =
-    Prelude.foldr (either left right) ([],[])
+    L.foldr (either left right) ([],[])
   where
     left  a ~(l, r) = (a:l, r)
     right a ~(l, r) = (l, a:r)
@@ -151,6 +154,10 @@ instance Foldable (Either e) where
 instance Traversable (Either e) where
   traverse _ (Left x)  = pure (Left x)
   traverse f (Right x) = Right <$> f x
+
+instance Semigroup (Either a b) where
+  Left _ <> b = b
+  a      <> _ = a
 
 -- deepseq
 instance (NFData a, NFData b) => NFData (Either a b) where

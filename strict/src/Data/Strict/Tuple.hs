@@ -45,31 +45,33 @@ module Data.Strict.Tuple (
   , unzip
 ) where
 
-import           Prelude             hiding (curry, fst, snd, uncurry, unzip,
-                                      zip)
+-- import parts explicitly, helps with compatibility
+import           Prelude (Functor (..), Eq, Ord, Show, Read, (.), Bounded, map)
+import           Control.Applicative ((<$>), (<*>))
+import           Data.Monoid (Monoid (..))
+import           Data.Semigroup (Semigroup (..))
+import           Data.Foldable (Foldable (..))
+import           Data.Traversable (Traversable (..))
+
+-- Lazy variants
+import qualified Prelude             as L
 
 import           Control.DeepSeq     (NFData (..))
 import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
-import           Data.Bitraversable  (Bitraversable (..))
 import           Data.Binary         (Binary (..))
+import           Data.Bitraversable  (Bitraversable (..))
+import           Data.Hashable       (Hashable(..))
+import           Data.Ix             (Ix (..))
+
 #if MIN_VERSION_base(4,7,0)
 import           Data.Data           (Data (..), Typeable)
 #else
 import           Data.Data           (Data (..), Typeable2 (..))
 #endif
-import           Data.Ix             (Ix (..))
-#if !MIN_VERSION_base(4,8,0)
-import           Control.Applicative (Applicative ((<*>)), (<$>))
-import           Data.Foldable       (Foldable (..))
-import           Data.Traversable    (Traversable (..))
-import           Data.Monoid         (Monoid (..))
-#endif
 #if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics        (Generic (..))
 #endif
-import           Data.Hashable       (Hashable(..))
-import           Data.Semigroup      (Semigroup (..))
 
 #ifdef MIN_VERSION_assoc
 import           Data.Bifunctor.Assoc (Assoc (..))
@@ -120,7 +122,7 @@ swap (a :!: b) = b :!: a
 
 -- | Zip for strict pairs (defined with zipWith).
 zip :: [a] -> [b] -> [Pair a b]
-zip x y = zipWith (:!:) x y
+zip x y = L.zipWith (:!:) x y
 
 -- | Unzip for stict pairs into a (lazy) pair of lists.
 unzip :: [Pair a b] -> ([a], [b])
