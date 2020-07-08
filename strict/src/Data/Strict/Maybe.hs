@@ -45,29 +45,30 @@ module Data.Strict.Maybe (
   , mapMaybe
 ) where
 
-import           Prelude             hiding (Maybe (..), maybe)
+-- import parts explicitly, helps with compatibility
+import           Prelude (Functor (..), Eq, Ord, Show, Read, Bool (..), (.), error)
+import           Control.Applicative (pure, (<$>))
+import           Data.Monoid (Monoid (..))
+import           Data.Semigroup (Semigroup (..))
+import           Data.Foldable (Foldable (..))
+import           Data.Traversable (Traversable (..))
+
+-- Lazy variants
 import qualified Prelude             as L
 
 import           Control.DeepSeq     (NFData (..))
 import           Data.Binary         (Binary (..))
+import           Data.Hashable       (Hashable(..))
+
 #if MIN_VERSION_base(4,7,0)
 import           Data.Data           (Data (..), Typeable)
 #else
 import           Data.Data           (Data (..), Typeable1 (..))
 #endif
-#if !MIN_VERSION_base(4,8,0)
-import           Control.Applicative (pure, (<$>))
-import           Data.Foldable       (Foldable (..))
-import           Data.Traversable    (Traversable (..))
-import           Data.Monoid         (Monoid (..))
-#endif
+
 #if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics        (Generic (..))
 #endif
-import           Data.Hashable       (Hashable(..))
-import           Data.Semigroup      (Semigroup)
-import qualified Data.Semigroup      as Semigroup
-
 
 -- | The type of strict optional values.
 data Maybe a = Nothing | Just !a deriving(Eq, Ord, Show, Read)
@@ -152,7 +153,7 @@ deriving instance Generic  (Maybe a)
 instance Semigroup a => Semigroup (Maybe a) where
   Nothing <> m       = m
   m       <> Nothing = m
-  Just x1 <> Just x2 = Just (x1 Semigroup.<> x2)
+  Just x1 <> Just x2 = Just (x1 <> x2)
 
 #if MIN_VERSION_base(4,11,0)
 instance Semigroup a => Monoid (Maybe a) where
