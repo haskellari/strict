@@ -5,3 +5,4 @@
 - Add `Strict lazy strict` type-class with `toStrict` / `toLazy`
   conversion functions
 - Modules are explicitly marked `Safe` or `Trustworthy`
+- Add strict `These`

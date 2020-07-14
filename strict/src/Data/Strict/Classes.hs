@@ -11,7 +11,9 @@ module Data.Strict.Classes (
 
 import Prelude ((.))
 import qualified Prelude as L
+import qualified Data.These as L
 
+import Data.Strict.These
 import Data.Strict.Tuple
 import Data.Strict.Maybe
 import Data.Strict.Either
@@ -56,6 +58,15 @@ instance Strict (L.Either a b) (Either a b) where
   
   toLazy (Left x)  = L.Left x
   toLazy (Right y) = L.Right y
+
+instance Strict (L.These a b) (These a b) where
+  toStrict (L.This x)    = This x
+  toStrict (L.That y)    = That y
+  toStrict (L.These x y) = These x y
+  
+  toLazy (This x)    = L.This x
+  toLazy (That y)    = L.That y
+  toLazy (These x y) = L.These x y
 
 instance Strict LBS.ByteString BS.ByteString where
 #if MIN_VERSION_bytestring(0,10,0)
