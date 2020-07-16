@@ -83,6 +83,9 @@ import Data.Functor.Classes
 import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
 #endif
 
+-- $setup
+-- >>> import Prelude (map)
+
 -- | The strict these type.
 data These a b = This !a | That !b | These !a !b
   deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
