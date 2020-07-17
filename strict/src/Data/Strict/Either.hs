@@ -6,6 +6,18 @@
 {-# LANGUAGE DeriveGeneric      #-}
 #endif
 
+#if MIN_VERSION_base(4,9,0)
+#define LIFTED_FUNCTOR_CLASSES 1
+#else
+#if MIN_VERSION_transformers(0,5,0)
+#define LIFTED_FUNCTOR_CLASSES 1
+#else
+#if MIN_VERSION_transformers_compat(0,5,0) && !MIN_VERSION_transformers(0,4,0)
+#define LIFTED_FUNCTOR_CLASSES 1
+#endif
+#endif
+#endif
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Strict.Either
@@ -36,7 +48,8 @@ module Data.Strict.Either (
 ) where
 
 -- import parts explicitly, helps with compatibility
-import           Prelude (Functor (..), Eq, Ord, Show, Read, Bool (..), (.), error)
+import           Prelude ( Functor (..), Eq (..), Ord (..), Show (..), Read (..), Bool (..), (.), ($)
+                         , error, Ordering (..), showParen, showString, lex, return, readParen)
 import           Control.Applicative (pure, (<$>))
 import           Data.Semigroup (Semigroup (..))
 import           Data.Foldable (Foldable (..))
@@ -51,6 +64,7 @@ import           Data.Bifunctor      (Bifunctor (..))
 import           Data.Binary         (Binary (..))
 import           Data.Bitraversable  (Bitraversable (..))
 import           Data.Hashable       (Hashable(..))
+import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
 
 #if MIN_VERSION_base(4,7,0)
 import           Data.Data           (Data (..), Typeable)
@@ -59,12 +73,24 @@ import           Data.Data           (Data (..), Typeable2 (..))
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic (..))
+import           GHC.Generics        (Generic, Generic1)
+#endif
+
+#if MIN_VERSION_deepseq(1,4,3)
+import Control.DeepSeq (NFData1 (..), NFData2 (..))
 #endif
 
 #ifdef MIN_VERSION_assoc
 import           Data.Bifunctor.Assoc (Assoc (..))
 import           Data.Bifunctor.Swap  (Swap (..))
+#endif
+
+#ifdef LIFTED_FUNCTOR_CLASSES
+import Data.Functor.Classes
+       (Eq1 (..), Eq2 (..), Ord1 (..), Ord2 (..), Read1 (..), Read2 (..),
+       Show1 (..), Show2 (..))
+#else
+import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
 #endif
 
 -- | The strict choice type.
@@ -138,6 +164,7 @@ deriving instance Typeable2 Either
 
 #if __GLASGOW_HASKELL__ >= 706
 deriving instance Generic  (Either a b)
+deriving instance Generic1 (Either a)
 #endif
 
 instance Functor (Either a) where
@@ -162,6 +189,14 @@ instance Semigroup (Either a b) where
 -- deepseq
 instance (NFData a, NFData b) => NFData (Either a b) where
   rnf = rnf . toLazy
+
+#if MIN_VERSION_deepseq(1,4,3)
+instance (NFData a) => NFData1 (Either a) where
+  liftRnf rnfA = liftRnf rnfA . toLazy
+
+instance NFData2 Either where
+  liftRnf2 rnfA rnfB = liftRnf2 rnfA rnfB . toLazy
+#endif
 
 -- binary
 instance (Binary a, Binary b) => Binary (Either a b) where
@@ -192,6 +227,12 @@ instance Bitraversable Either where
 instance (Hashable a, Hashable b) => Hashable (Either a b) where
   hashWithSalt salt = hashWithSalt salt . toLazy
 
+instance (Hashable a) => Hashable1 (Either a) where
+  liftHashWithSalt hashA salt = liftHashWithSalt hashA salt . toLazy
+
+instance Hashable2 Either where
+  liftHashWithSalt2 hashA hashB salt = liftHashWithSalt2 hashA hashB salt . toLazy
+
 -- assoc
 #ifdef MIN_VERSION_assoc
 instance Assoc Either where
@@ -206,4 +247,57 @@ instance Assoc Either where
 instance Swap Either where
     swap (Left x) = Right x
     swap (Right x) = Left x
+#endif
+
+-- Data.Functor.Classes
+#ifdef LIFTED_FUNCTOR_CLASSES
+instance Eq2 Either where
+  liftEq2 f _ (Left a)  (Left a')  = f a a'
+  liftEq2 _ g (Right b) (Right b') = g b b'
+  liftEq2 _ _ _         _          = False
+
+instance Eq a => Eq1 (Either a) where
+  liftEq = liftEq2 (==)
+
+instance Ord2 Either where
+  liftCompare2 f _ (Left a)    (Left a')     = f a a'
+  liftCompare2 _ _ (Left _)    _             = LT
+  liftCompare2 _ _ _           (Left _)      = GT
+  liftCompare2 _ g (Right b)    (Right b')     = g b b'
+
+instance Ord a => Ord1 (Either a) where
+  liftCompare = liftCompare2 compare
+
+instance Show a => Show1 (Either a) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show2 Either where
+  liftShowsPrec2 sa _ _sb _ d (Left a) = showParen (d > 10)
+    $ showString "Left "
+    . sa 11 a
+  liftShowsPrec2 _sa _ sb _ d (Right b) = showParen (d > 10)
+    $ showString "Right "
+    . sb 11 b
+
+instance Read2 Either where
+  liftReadsPrec2 ra _ rb _ d = readParen (d > 10) $ \s -> cons s
+    where
+      cons s0 = do
+        (ident, s1) <- lex s0
+        case ident of
+            "Left" ->  do
+                (a, s2) <- ra 11 s1
+                return (Left a, s2)
+            "Right" ->  do
+                (b, s2) <- rb 11 s1
+                return (Right b, s2)
+            _ -> []
+
+instance Read a => Read1 (Either a) where
+  liftReadsPrec = liftReadsPrec2 readsPrec readList
+#else
+instance Eq a   => Eq1   (Either a) where eq1        = (==)
+instance Ord a  => Ord1  (Either a) where compare1   = compare
+instance Show a => Show1 (Either a) where showsPrec1 = showsPrec
+instance Read a => Read1 (Either a) where readsPrec1 = readsPrec
 #endif
