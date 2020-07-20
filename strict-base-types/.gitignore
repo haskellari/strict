@@ -1,6 +1,0 @@
-/dist/
-/dist-newstyle/
-.ghc.environment.*
-/.hsenv/
-.stack-work/
-stack.yaml
