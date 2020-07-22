@@ -1,10 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
-{-# LANGUAGE StandaloneDeriving #-}
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
 #ifndef __HADDOCK__
 #ifdef __GLASGOW_HASKELL__
 {-# LANGUAGE TypeOperators      #-}
@@ -77,14 +74,11 @@ import           Data.Bitraversable  (Bitraversable (..))
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
 import           Data.Ix             (Ix (..))
-
-#if MIN_VERSION_base(4,7,0)
+import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
-#else
-import           Data.Data           (Data (..), Typeable2 (..))
-#endif
+
 #if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic, Generic1)
+import           GHC.Generics        (Generic1)
 #endif
 
 #if MIN_VERSION_deepseq(1,4,3)
@@ -115,7 +109,12 @@ import Data.Tuple ()
 infixl 2 :!:
 
 -- | The type of strict pairs.
-data Pair a b = !a :!: !b deriving (Eq, Ord, Show, Read, Bounded, Ix)
+data Pair a b = !a :!: !b
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Bounded, Ix
+#if __GLASGOW_HASKELL__ >= 706
+    , Generic1
+#endif
+    )
 
 #ifndef __HADDOCK__
 #ifdef __GLASGOW_HASKELL__
@@ -162,21 +161,6 @@ unzip x = ( map fst x
 
 -- Instances
 ------------
-
-#if __GLASGOW_HASKELL__ >= 608
-deriving instance (Data a, Data b) => Data (Pair a b)
-#endif
-#if MIN_VERSION_base(4,7,0)
-deriving instance Typeable Pair
-#else
-deriving instance Typeable2 Pair
-#endif
-
--- fails with compiler panic on GHC 7.4.2
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Generic  (Pair a b)
-deriving instance Generic1 (Pair a)
-#endif
 
 instance Functor (Pair e) where
     fmap f = toStrict . fmap f . toLazy
