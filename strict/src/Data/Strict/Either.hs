@@ -1,10 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
-{-# LANGUAGE StandaloneDeriving #-}
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
 
 #if MIN_VERSION_base(4,9,0)
 #define LIFTED_FUNCTOR_CLASSES 1
@@ -65,15 +62,11 @@ import           Data.Binary         (Binary (..))
 import           Data.Bitraversable  (Bitraversable (..))
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
-
-#if MIN_VERSION_base(4,7,0)
+import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
-#else
-import           Data.Data           (Data (..), Typeable2 (..))
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic, Generic1)
+import           GHC.Generics        (Generic1)
 #endif
 
 #if MIN_VERSION_deepseq(1,4,3)
@@ -94,7 +87,12 @@ import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
 #endif
 
 -- | The strict choice type.
-data Either a b = Left !a | Right !b deriving(Eq, Ord, Read, Show)
+data Either a b = Left !a | Right !b
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
+#if __GLASGOW_HASKELL__ >= 706
+    , Generic1
+#endif
+    )
 
 toStrict :: L.Either a b -> Either a b
 toStrict (L.Left x)  = Left x
@@ -152,20 +150,6 @@ partitionEithers =
 
 -- Instances
 ------------
-
-#if __GLASGOW_HASKELL__ >= 608
-deriving instance (Data a, Data b) => Data (Either a b)
-#endif
-#if MIN_VERSION_base(4,7,0)
-deriving instance Typeable Either
-#else
-deriving instance Typeable2 Either
-#endif
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Generic  (Either a b)
-deriving instance Generic1 (Either a)
-#endif
 
 instance Functor (Either a) where
   fmap _ (Left  x) = Left x

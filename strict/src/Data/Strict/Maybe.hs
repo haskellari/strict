@@ -1,10 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
-{-# LANGUAGE StandaloneDeriving #-}
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
 
 #if MIN_VERSION_base(4,9,0)
 #define LIFTED_FUNCTOR_CLASSES 1
@@ -73,15 +70,12 @@ import           Control.DeepSeq     (NFData (..))
 import           Data.Binary         (Binary (..))
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..))
-
-#if MIN_VERSION_base(4,7,0)
+import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
-#else
-import           Data.Data           (Data (..), Typeable1 (..))
-#endif
+
 
 #if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic, Generic1)
+import           GHC.Generics        (Generic1)
 #endif
 
 #if MIN_VERSION_deepseq(1,4,3)
@@ -95,7 +89,12 @@ import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
 #endif
 
 -- | The type of strict optional values.
-data Maybe a = Nothing | Just !a deriving(Eq, Ord, Show, Read)
+data Maybe a = Nothing | Just !a
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
+#if __GLASGOW_HASKELL__ >= 706
+    , Generic1
+#endif
+    )
 
 toStrict :: L.Maybe a -> Maybe a
 toStrict L.Nothing  = Nothing
@@ -160,20 +159,6 @@ mapMaybe f (x:xs) = case f x of
 
 -- Instances
 ------------
-
-#if __GLASGOW_HASKELL__ >= 608
-deriving instance Data a => Data (Maybe a)
-#endif
-#if MIN_VERSION_base(4,7,0)
-deriving instance Typeable Maybe
-#else
-deriving instance Typeable1 Maybe
-#endif
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Generic  (Maybe a)
-deriving instance Generic1 Maybe
-#endif
 
 instance Semigroup a => Semigroup (Maybe a) where
   Nothing <> m       = m
