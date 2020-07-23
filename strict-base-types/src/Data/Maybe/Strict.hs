@@ -56,8 +56,8 @@ import qualified Prelude             as L
 import           Control.Lens.Iso    (Strict (..), iso)
 import           Control.Lens.Prism  (Prism, Prism', prism, prism')
 import           Data.Aeson          (FromJSON (..), ToJSON (..))
-import           Test.QuickCheck     (Arbitrary (..))
 
+import Test.QuickCheck.Instances.Strict ()
 
 -- missing instances
 --------------------
@@ -68,11 +68,6 @@ instance ToJSON a => ToJSON (Maybe a) where
 
 instance FromJSON a => FromJSON (Maybe a) where
   parseJSON val = fmap toStrict (parseJSON val)
-
--- quickcheck
-instance Arbitrary a => Arbitrary (Maybe a) where
-  arbitrary = fmap toStrict arbitrary
-  shrink    = map toStrict . shrink . toLazy
 
 -- lens
 instance Strict (L.Maybe a) (Maybe a) where

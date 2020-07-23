@@ -55,11 +55,12 @@ import           Data.Aeson          (FromJSON (..), ToJSON (..))
 #if !MIN_VERSION_base(4,8,0)
 import           Control.Applicative (Applicative ((<*>)), (<$>))
 #endif
-import           Test.QuickCheck     (Arbitrary (..))
 
 #if __HADDOCK__
 import Data.Tuple ()
 #endif
+
+import Test.QuickCheck.Instances.Strict ()
 
 -- missing instances
 --------------------
@@ -70,11 +71,6 @@ instance (ToJSON a, ToJSON b) => ToJSON (Pair a b) where
 
 instance (FromJSON a, FromJSON b) => FromJSON (Pair a b) where
   parseJSON val = toStrict <$> parseJSON val
-
--- quickcheck
-instance (Arbitrary a, Arbitrary b) => Arbitrary (Pair a b) where
-  arbitrary = toStrict <$> arbitrary
-  shrink    = map toStrict . shrink . toLazy
 
 -- lens
 instance Strict (a, b) (Pair a b) where
