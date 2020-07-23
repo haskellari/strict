@@ -114,8 +114,11 @@ install:
   - touch cabal.project
   - |
     echo "packages: strict" >> cabal.project
+    echo "packages: strict-lens" >> cabal.project
     echo "packages: strict-base-types" >> cabal.project
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
+  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
+  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-lens' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
@@ -124,10 +127,11 @@ install:
     echo "  type:     git"                                        >> cabal.project
     echo "  location: https://github.com/phadej/qc-instances.git" >> cabal.project
     echo "  tag:      380204ba34b7844d594748a722e122958dde56c6"   >> cabal.project
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   - if [ -f "strict/configure.ac" ]; then (cd "strict" && autoreconf -i); fi
+  - if [ -f "strict-lens/configure.ac" ]; then (cd "strict-lens" && autoreconf -i); fi
   - if [ -f "strict-base-types/configure.ac" ]; then (cd "strict-base-types" && autoreconf -i); fi
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
@@ -144,14 +148,18 @@ script:
   - find . -maxdepth 1 -type f -name '*.tar.gz' -exec tar -xvf '{}' \;
   - find . -maxdepth 1 -type f -name '*.tar.gz' -exec rm       '{}' \;
   - PKGDIR_strict="$(find . -maxdepth 1 -type d -regex '.*/strict-[0-9.]*')"
+  - PKGDIR_strict_lens="$(find . -maxdepth 1 -type d -regex '.*/strict-lens-[0-9.]*')"
   - PKGDIR_strict_base_types="$(find . -maxdepth 1 -type d -regex '.*/strict-base-types-[0-9.]*')"
   # Generate cabal.project
   - rm -rf cabal.project cabal.project.local cabal.project.freeze
   - touch cabal.project
   - |
     echo "packages: ${PKGDIR_strict}" >> cabal.project
+    echo "packages: ${PKGDIR_strict_lens}" >> cabal.project
     echo "packages: ${PKGDIR_strict_base_types}" >> cabal.project
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
+  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
+  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-lens' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
@@ -160,7 +168,7 @@ script:
     echo "  type:     git"                                        >> cabal.project
     echo "  location: https://github.com/phadej/qc-instances.git" >> cabal.project
     echo "  tag:      380204ba34b7844d594748a722e122958dde56c6"   >> cabal.project
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   # Building...
@@ -171,6 +179,7 @@ script:
   - ${CABAL} v2-build $WITHCOMPILER ${TEST} ${BENCH} all
   # cabal check...
   - (cd ${PKGDIR_strict} && ${CABAL} -vnormal check)
+  - (cd ${PKGDIR_strict_lens} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_strict_base_types} && ${CABAL} -vnormal check)
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
