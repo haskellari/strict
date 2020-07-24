@@ -24,7 +24,7 @@
 --
 -----------------------------------------------------------------------------
 module Data.Either.Strict (
-    Either(Left, Right)
+    Either(..)
   , isRight
   , isLeft
   , either
@@ -36,15 +36,14 @@ module Data.Either.Strict (
 ) where
 
 import           Data.Strict.Classes (toStrict, toLazy)
-import           Data.Strict.Either  (Either (Left, Right), either, isLeft,
+import           Data.Strict.Either  (Either (..), either, isLeft,
                                       isRight, lefts, rights, partitionEithers)
 import           Prelude             hiding (Either (..), either)
-import qualified Prelude             as L
 
-import           Control.Lens.Iso    (Strict (..), Swapped (..), iso)
-import           Control.Lens.Prism  (Prism, prism)
 import           Data.Aeson          (FromJSON (..), ToJSON (..))
 
+
+import Data.Strict.Lens (_Left, _Right)
 import Test.QuickCheck.Instances.Strict ()
 
 -- missing instances
@@ -56,20 +55,3 @@ instance (ToJSON a, ToJSON b) => ToJSON (Either a b) where
 
 instance (FromJSON a, FromJSON b) => FromJSON (Either a b) where
   parseJSON val = fmap toStrict (parseJSON val)
-
--- lens
-instance Strict (L.Either a b) (Either a b) where
-  strict = iso toStrict toLazy
-
-instance Swapped Either where
-  swapped = either Right Left `iso` either Right Left
-
--- TODO: Each (Either a)
-
--- | Analogous to 'Control.Lens.Prism._Left' in "Control.Lens.Prism".
-_Left :: Prism (Either a c) (Either b c) a b
-_Left = prism Left $ either L.Right (L.Left . Right)
-
--- | Analogous to 'Control.Lens.Prism._Right' in "Control.Lens.Prism".
-_Right :: Prism (Either c a) (Either c b) a b
-_Right = prism Right $ either (L.Left . Left) L.Right

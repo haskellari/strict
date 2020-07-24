@@ -31,7 +31,7 @@
 -----------------------------------------------------------------------------
 
 module Data.Maybe.Strict (
-     Maybe(Nothing,Just)
+     Maybe(..)
    , maybe
 
    , isJust
@@ -47,16 +47,14 @@ module Data.Maybe.Strict (
 ) where
 
 import           Data.Strict.Classes (toStrict, toLazy)
-import           Data.Strict.Maybe   (Maybe (Nothing, Just), fromJust,
+import           Data.Strict.Maybe   (Maybe (..), fromJust,
                                       fromMaybe, isJust, isNothing, maybe,
                                       listToMaybe, maybeToList, mapMaybe, catMaybes)
 import           Prelude             hiding (Maybe (..), maybe)
-import qualified Prelude             as L
 
-import           Control.Lens.Iso    (Strict (..), iso)
-import           Control.Lens.Prism  (Prism, Prism', prism, prism')
 import           Data.Aeson          (FromJSON (..), ToJSON (..))
 
+import Data.Strict.Lens (_Just, _Nothing)
 import Test.QuickCheck.Instances.Strict ()
 
 -- missing instances
@@ -68,17 +66,3 @@ instance ToJSON a => ToJSON (Maybe a) where
 
 instance FromJSON a => FromJSON (Maybe a) where
   parseJSON val = fmap toStrict (parseJSON val)
-
--- lens
-instance Strict (L.Maybe a) (Maybe a) where
-  strict = iso toStrict toLazy
-
--- TODO: Each Maybe
-
--- | Analogous to 'Control.Lens.Prism._Just' in "Control.Lens.Prism"
-_Just :: Prism (Maybe a) (Maybe b) a b
-_Just = prism Just $ maybe (Left Nothing) Right
-
--- | Analogous to 'Control.Lens.Prism._Nothing' in "Control.Lens.Prism"
-_Nothing :: Prism' (Maybe a) ()
-_Nothing = prism' (const Nothing) $ maybe (L.Just ()) (const L.Nothing)
