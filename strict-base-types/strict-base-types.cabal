@@ -1,5 +1,5 @@
 Name:           strict-base-types
-Version:        0.7
+Version:        0.6.2
 Synopsis:       Strict variants of the types provided in base.
 Category:       Data
 Description:
@@ -125,7 +125,7 @@ library
   ghc-options:    -Wall -fwarn-incomplete-uni-patterns
   if impl(ghc >= 8.0)
     ghc-options: -Wcompat -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
-  build-depends: strict >=0.4 && <0.4.1
+  build-depends: strict >=0.3 && <0.4
   build-depends:
       base       >= 4.5     && < 5
     , lens       >= 4.19.2  && < 4.20
