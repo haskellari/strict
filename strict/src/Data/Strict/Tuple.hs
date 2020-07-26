@@ -22,14 +22,6 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Strict.Tuple
--- Copyright   :  (c) 2006-2007 Roman Leshchinskiy
---                (c) 2013 Simon Meier
--- License     :  BSD-style (see the file LICENSE)
---
--- Maintainer  :  Simon Meier <iridcode@gmail.com>
--- Stability   :  experimental
--- Portability :  portable
 --
 -- The strict variant of the standard Haskell pairs and the corresponding
 -- variants of the functions from "Data.Tuple".

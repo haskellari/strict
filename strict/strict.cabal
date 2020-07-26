@@ -47,7 +47,11 @@ License:        BSD3
 License-File:   LICENSE
 Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
                 Simon Meier <iridcode@gmail.com>
-Maintainer:     Don Stewart <dons@galois.com>, Bas van Dijk <v.dijk.bas@gmail.com>, Oleg Grenrus <oleg.grenrus@iki.fi>, Simon Meier <iridcode@gmail.com>, Ximin Luo <infinity0@pwned.gg>
+Maintainer:     Don Stewart <dons@galois.com>,
+                Bas van Dijk <v.dijk.bas@gmail.com>,
+                Oleg Grenrus <oleg.grenrus@iki.fi>,
+                Simon Meier <iridcode@gmail.com>,
+                Ximin Luo <infinity0@pwned.gg>
 Copyright:      (c) 2006-2008 by Roman Leshchinskiy
                 (c) 2013-2014 by Simon Meier
 Homepage:       https://github.com/haskell-strict/strict
@@ -108,10 +112,10 @@ library
     build-depends: assoc >= 1.0.1 && < 1.1
 
   exposed-modules:
-        Data.Strict
-        Data.Strict.Classes
-        Data.Strict.These
-        Data.Strict.Tuple
-        Data.Strict.Maybe
-        Data.Strict.Either
-        System.IO.Strict
+    Data.Strict
+    Data.Strict.Classes
+    Data.Strict.These
+    Data.Strict.Tuple
+    Data.Strict.Maybe
+    Data.Strict.Either
+    System.IO.Strict

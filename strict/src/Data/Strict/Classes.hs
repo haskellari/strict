@@ -5,6 +5,7 @@
 #else
 {-# LANGUAGE Trustworthy #-}
 #endif
+
 module Data.Strict.Classes (
     Strict (..),
 ) where
