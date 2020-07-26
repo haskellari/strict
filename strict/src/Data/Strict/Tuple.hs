@@ -106,7 +106,7 @@ import Data.Tuple ()
 -- >>> import Prelude (Char, String)
 -- >>> import Data.Functor.Classes (readsPrec2)
 
-infixl 2 :!:
+infix 2 :!:
 
 -- | The type of strict pairs.
 data Pair a b = !a :!: !b
