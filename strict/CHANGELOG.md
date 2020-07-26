@@ -6,3 +6,4 @@
   conversion functions
 - Modules are explicitly marked `Safe` or `Trustworthy`
 - Add strict `These`
+- `:!:` (`Pair` constructor) is non-associative
