@@ -46,23 +46,8 @@ module Data.Maybe.Strict (
    , _Nothing
 ) where
 
-import           Data.Strict.Classes (toStrict, toLazy)
-import           Data.Strict.Maybe   (Maybe (..), fromJust,
-                                      fromMaybe, isJust, isNothing, maybe,
-                                      listToMaybe, maybeToList, mapMaybe, catMaybes)
-import           Prelude             hiding (Maybe (..), maybe)
-
-import           Data.Aeson          (FromJSON (..), ToJSON (..))
-
+import Data.Aeson ()
 import Data.Strict.Lens (_Just, _Nothing)
+import Data.Strict.Maybe   (Maybe (..), fromJust, fromMaybe, isJust, isNothing, maybe, listToMaybe, maybeToList, mapMaybe, catMaybes)
+import Prelude ()
 import Test.QuickCheck.Instances.Strict ()
-
--- missing instances
---------------------
-
--- aeson
-instance ToJSON a => ToJSON (Maybe a) where
-  toJSON = toJSON . toLazy
-
-instance FromJSON a => FromJSON (Maybe a) where
-  parseJSON val = fmap toStrict (parseJSON val)

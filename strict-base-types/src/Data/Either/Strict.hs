@@ -35,23 +35,8 @@ module Data.Either.Strict (
   , _Right
 ) where
 
-import           Data.Strict.Classes (toStrict, toLazy)
-import           Data.Strict.Either  (Either (..), either, isLeft,
-                                      isRight, lefts, rights, partitionEithers)
-import           Prelude             hiding (Either (..), either)
-
-import           Data.Aeson          (FromJSON (..), ToJSON (..))
-
-
+import Data.Aeson ()
+import Data.Strict.Either  (Either (..), either, isLeft, isRight, lefts, rights, partitionEithers)
 import Data.Strict.Lens (_Left, _Right)
+import Prelude ()
 import Test.QuickCheck.Instances.Strict ()
-
--- missing instances
---------------------
-
--- aeson
-instance (ToJSON a, ToJSON b) => ToJSON (Either a b) where
-  toJSON = toJSON . toLazy
-
-instance (FromJSON a, FromJSON b) => FromJSON (Either a b) where
-  parseJSON val = fmap toStrict (parseJSON val)
