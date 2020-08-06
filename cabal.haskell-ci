@@ -3,6 +3,9 @@ branches: master
 -- we have inplace dependencies
 install-dependencies: False
 
+-- to allow different set of packages per GHC versions
+jobs-selection: any
+
 -- test that we build fine with assoc flag disabled
 constraint-set no-assoc
   constraints: strict -assoc

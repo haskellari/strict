@@ -116,19 +116,23 @@ install:
     echo "packages: strict" >> cabal.project
     echo "packages: strict-lens" >> cabal.project
     echo "packages: strict-base-types" >> cabal.project
+    if [ $HCNUMVER -ge 80000 ] ; then echo "packages: strict-optics" >> cabal.project ; fi
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-lens' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
+  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-optics' >> cabal.project ; fi
+  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens|strict-optics)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   - if [ -f "strict/configure.ac" ]; then (cd "strict" && autoreconf -i); fi
   - if [ -f "strict-lens/configure.ac" ]; then (cd "strict-lens" && autoreconf -i); fi
   - if [ -f "strict-base-types/configure.ac" ]; then (cd "strict-base-types" && autoreconf -i); fi
+  - if [ -f "strict-optics/configure.ac" ]; then (cd "strict-optics" && autoreconf -i); fi
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
   - rm  cabal.project.freeze
@@ -144,6 +148,7 @@ script:
   - PKGDIR_strict="$(find . -maxdepth 1 -type d -regex '.*/strict-[0-9.]*')"
   - PKGDIR_strict_lens="$(find . -maxdepth 1 -type d -regex '.*/strict-lens-[0-9.]*')"
   - PKGDIR_strict_base_types="$(find . -maxdepth 1 -type d -regex '.*/strict-base-types-[0-9.]*')"
+  - PKGDIR_strict_optics="$(find . -maxdepth 1 -type d -regex '.*/strict-optics-[0-9.]*')"
   # Generate cabal.project
   - rm -rf cabal.project cabal.project.local cabal.project.freeze
   - touch cabal.project
@@ -151,14 +156,17 @@ script:
     echo "packages: ${PKGDIR_strict}" >> cabal.project
     echo "packages: ${PKGDIR_strict_lens}" >> cabal.project
     echo "packages: ${PKGDIR_strict_base_types}" >> cabal.project
+    if [ $HCNUMVER -ge 80000 ] ; then echo "packages: ${PKGDIR_strict_optics}" >> cabal.project ; fi
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-lens' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
+  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-optics' >> cabal.project ; fi
+  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens|strict-optics)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   # Building...
@@ -171,6 +179,7 @@ script:
   - (cd ${PKGDIR_strict} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_strict_lens} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_strict_base_types} && ${CABAL} -vnormal check)
+  - if [ $HCNUMVER -ge 80000 ] ; then (cd ${PKGDIR_strict_optics} && ${CABAL} -vnormal check) ; fi
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
   # Building without installed constraints for packages in global-db...
