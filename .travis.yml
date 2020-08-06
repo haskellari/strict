@@ -123,10 +123,6 @@ install:
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-    echo "source-repository-package"                              >> cabal.project
-    echo "  type:     git"                                        >> cabal.project
-    echo "  location: https://github.com/phadej/qc-instances.git" >> cabal.project
-    echo "  tag:      380204ba34b7844d594748a722e122958dde56c6"   >> cabal.project
   - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
@@ -136,8 +132,6 @@ install:
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
   - rm  cabal.project.freeze
-  - travis_wait 40 ${CABAL} v2-build $WITHCOMPILER ${TEST} ${BENCH} --dep -j2 all
-  - travis_wait 40 ${CABAL} v2-build $WITHCOMPILER --disable-tests --disable-benchmarks --dep -j2 all
 script:
   - DISTDIR=$(mktemp -d /tmp/dist-test.XXXX)
   # Packaging...
@@ -164,10 +158,6 @@ script:
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict-base-types' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-    echo "source-repository-package"                              >> cabal.project
-    echo "  type:     git"                                        >> cabal.project
-    echo "  location: https://github.com/phadej/qc-instances.git" >> cabal.project
-    echo "  tag:      380204ba34b7844d594748a722e122958dde56c6"   >> cabal.project
   - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(strict|strict-base-types|strict-lens)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
