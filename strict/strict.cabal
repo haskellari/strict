@@ -39,10 +39,6 @@ Description:
     This library comes with batteries included; i.e., mirror functions and
     instances of the lazy versions in @base@. It also includes instances for
     type-classes from the @deepseq@, @binary@, and @hashable@ packages.
-    .
-    For an even larger set of features, see the @strict-base-types@ library,
-    which contains more utilities and instances for type-classes from the
-    @lens@, @aeson@, and @QuickCheck@ packages, and more.
 License:        BSD3
 License-File:   LICENSE
 Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
