@@ -1,3 +1,7 @@
 packages: strict/
 packages: strict-lens/
 packages: strict-base-types/
+
+-- This requires GHC-8.0+
+-- if testing older compilers, comment this out
+packages: strict-optics/
