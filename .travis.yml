@@ -115,7 +115,7 @@ install:
   - |
     echo "packages: strict" >> cabal.project
     echo "packages: strict-lens" >> cabal.project
-    echo "packages: strict-base-types" >> cabal.project
+    if [ $HCNUMVER -ge 70800 ] ; then echo "packages: strict-base-types" >> cabal.project ; fi
     if [ $HCNUMVER -ge 80000 ] ; then echo "packages: strict-optics" >> cabal.project ; fi
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
@@ -155,7 +155,7 @@ script:
   - |
     echo "packages: ${PKGDIR_strict}" >> cabal.project
     echo "packages: ${PKGDIR_strict_lens}" >> cabal.project
-    echo "packages: ${PKGDIR_strict_base_types}" >> cabal.project
+    if [ $HCNUMVER -ge 70800 ] ; then echo "packages: ${PKGDIR_strict_base_types}" >> cabal.project ; fi
     if [ $HCNUMVER -ge 80000 ] ; then echo "packages: ${PKGDIR_strict_optics}" >> cabal.project ; fi
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package strict' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
@@ -178,7 +178,7 @@ script:
   # cabal check...
   - (cd ${PKGDIR_strict} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_strict_lens} && ${CABAL} -vnormal check)
-  - (cd ${PKGDIR_strict_base_types} && ${CABAL} -vnormal check)
+  - if [ $HCNUMVER -ge 70800 ] ; then (cd ${PKGDIR_strict_base_types} && ${CABAL} -vnormal check) ; fi
   - if [ $HCNUMVER -ge 80000 ] ; then (cd ${PKGDIR_strict_optics} && ${CABAL} -vnormal check) ; fi
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all

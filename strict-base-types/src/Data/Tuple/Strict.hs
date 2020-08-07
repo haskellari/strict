@@ -22,7 +22,6 @@
 --
 -----------------------------------------------------------------------------
 
-
 module Data.Tuple.Strict (
     Pair(..)
   , fst
@@ -34,30 +33,8 @@ module Data.Tuple.Strict (
   , unzip
 ) where
 
-import           Data.Strict.Classes (toStrict, toLazy)
-import           Data.Strict.Tuple   (Pair (..), curry, fst, snd, uncurry,
-                                      swap, unzip, zip)
-import           Prelude             hiding (curry, fst, snd, uncurry, unzip,
-                                      zip)
-
-import           Data.Aeson          (FromJSON (..), ToJSON (..))
-#if !MIN_VERSION_base(4,8,0)
-import           Control.Applicative ((<$>))
-#endif
-
-#if __HADDOCK__
-import Data.Tuple ()
-#endif
-
+import Data.Aeson ()
 import Data.Strict.Lens ()
+import Data.Strict.Tuple (Pair (..), curry, fst, snd, uncurry, swap, unzip, zip)
+import Prelude ()
 import Test.QuickCheck.Instances.Strict ()
-
--- missing instances
---------------------
-
--- aeson
-instance (ToJSON a, ToJSON b) => ToJSON (Pair a b) where
-  toJSON = toJSON . toLazy
-
-instance (FromJSON a, FromJSON b) => FromJSON (Pair a b) where
-  parseJSON val = toStrict <$> parseJSON val
