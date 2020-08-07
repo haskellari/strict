@@ -1,3 +1,13 @@
+* 0.7
+  - `strict-base-types` contents have been migrated to
+      - `strict >=0.4`
+      - `quickcheck-instances >=0.3.24`
+      - `aeson >=1.5.3.0`
+      - or `strict-lens >=0.4`
+
+    This version has similar exposed API as 0.6.1,
+    but we recommend to start using them directly (by specifying lower bounds).
+
 * 0.6.1
   - Add contributions by Oleg Grenrus (@phadej)
     - Make 'Semigroup' instances available on all `base` versions.
