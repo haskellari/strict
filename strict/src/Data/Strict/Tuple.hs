@@ -137,7 +137,7 @@ curry f x y = f (x :!: y)
 uncurry :: (a -> b -> c) -> Pair a b -> c
 uncurry f (x :!: y) = f x y
 
--- | Analagous to 'L.swap' from "Data.Tuple"
+-- | Analogous to 'L.swap' from "Data.Tuple"
 swap :: Pair a b -> Pair b a
 swap (a :!: b) = b :!: a
 
