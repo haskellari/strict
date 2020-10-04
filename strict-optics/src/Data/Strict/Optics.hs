@@ -103,7 +103,7 @@ instance Swapped These where
 instance (a ~ a', b ~ b') => Each (Either () ()) (These a a') (These b b') a b where
     each = itraversalVL aux where
         aux f (This a)    = This <$> f (Left ()) a
-        aux f (That b)    = This <$> f (Right ()) b
+        aux f (That b)    = That <$> f (Right ()) b
         aux f (These a b) = These <$> f (Left ()) a <*> f (Right ()) b
 
 -- | A 'Control.Lens.Traversal' of the first half of a 'These', suitable for use with "Control.Lens".

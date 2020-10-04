@@ -1,5 +1,5 @@
 name:               strict-lens
-version:            0.4
+version:            0.4.0.1
 synopsis:           Lenses for types in strict package
 category:           Data, Lenses
 description:        Lenses for types in strict package.

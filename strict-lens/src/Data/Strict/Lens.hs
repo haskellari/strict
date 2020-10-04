@@ -106,7 +106,7 @@ instance Swapped These where
 
 instance (a ~ a', b ~ b') => Each (These a a') (These b b') a b where
     each f (This a)    = This <$> f a
-    each f (That b)    = This <$> f b
+    each f (That b)    = That <$> f b
     each f (These a b) = These <$> f a <*> f b
 
 -- | A 'Control.Lens.Traversal' of the first half of a 'These', suitable for use with "Control.Lens".
