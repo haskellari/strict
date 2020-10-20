@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
 
 #if MIN_VERSION_base(4,9,0)
@@ -58,6 +57,7 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
+import           Codec.Serialise     (Serialise (..))
 import           Control.DeepSeq     (NFData (..))
 import           Data.Binary         (Binary (..))
 import           Data.Hashable       (Hashable(..))
@@ -194,6 +194,11 @@ instance NFData1 Maybe where
 instance Binary a => Binary (Maybe a) where
   put = put . toLazy
   get = toStrict <$> get
+
+-- serialise
+instance Serialise a => Serialise (Maybe a) where
+  encode = encode . toLazy
+  decode = toStrict <$> decode
 
 -- hashable
 instance Hashable a => Hashable (Maybe a) where

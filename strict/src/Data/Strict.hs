@@ -1,5 +1,3 @@
-{-# LANGUAGE Safe #-}
-
 -- | Strict versions of some standard Haskell types.
 module Data.Strict (
     module Data.Strict.Classes

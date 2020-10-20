@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
 #ifndef __HADDOCK__
 #ifdef __GLASGOW_HASKELL__
@@ -58,6 +57,7 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
+import           Codec.Serialise     (Serialise (..))
 import           Control.DeepSeq     (NFData (..))
 import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
@@ -186,6 +186,11 @@ instance NFData2 Pair where
 instance (Binary a, Binary b) => Binary (Pair a b) where
   put = put . toLazy
   get = toStrict <$> get
+
+-- serialise
+instance (Serialise a, Serialise b) => Serialise (Pair a b) where
+  encode = encode . toLazy
+  decode = toStrict <$> decode
 
 -- bifunctors
 instance Bifunctor Pair where

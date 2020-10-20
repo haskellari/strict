@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
 
 #if MIN_VERSION_base(4,9,0)
@@ -47,6 +46,7 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
+import           Codec.Serialise     (Serialise (..))
 import           Control.DeepSeq     (NFData (..))
 import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
@@ -178,6 +178,11 @@ instance NFData2 Either where
 instance (Binary a, Binary b) => Binary (Either a b) where
   put = put . toLazy
   get = toStrict <$> get
+
+-- serialise
+instance (Serialise a, Serialise b) => Serialise (Either a b) where
+  encode = encode . toLazy
+  decode = toStrict <$> decode
 
 -- bifunctors
 instance Bifunctor Either where
