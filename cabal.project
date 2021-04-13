@@ -1,4 +1,5 @@
 packages: strict/
 packages: strict-lens/
+packages: strict-containers/
 packages: strict-base-types/
 packages: strict-optics/

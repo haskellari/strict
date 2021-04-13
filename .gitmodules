@@ -1,0 +1,6 @@
+[submodule "contrib/containers"]
+	path = contrib/containers
+	url = https://github.com/haskell/containers
+[submodule "contrib/unordered-containers"]
+	path = contrib/unordered-containers
+	url = https://github.com/haskell-unordered-containers/unordered-containers

@@ -1,0 +1,40 @@
+Note: this patch is not "perfect":
+
+The HashMap data structure uses a bunch of primitive Array# that we can't
+duplicate and transform to use ! strictness annotations. However, the hashmap
+implementation in Data.HashMap.Internal is quite disciplined about forcing
+values before inserting them into arrays.
+
+See https://github.com/haskell-unordered-containers/unordered-containers/issues/311 for more discussion
+
+Index: strict-containers/src/Data/Strict/HashMap/Autogen/Strict.hs
+===================================================================
+--- strict-containers.orig/src/Data/Strict/HashMap/Autogen/Strict.hs
++++ strict-containers/src/Data/Strict/HashMap/Autogen/Strict.hs
+@@ -99,13 +99,9 @@ module Data.Strict.HashMap.Autogen.Stric
+     , fromList
+     , fromListWith
+     , fromListWithKey
+-
+-      -- ** HashSets
+-    , HS.keysSet
+     ) where
+ 
+ import Data.Strict.HashMap.Autogen.Internal.Strict as HM
+-import qualified Data.HashSet.Internal as HS
+ import Prelude ()
+ 
+ -- $strictness
+Index: strict-containers/src/Data/Strict/HashMap/Autogen/Internal.hs
+===================================================================
+--- strict-containers.orig/src/Data/Strict/HashMap/Autogen/Internal.hs
++++ strict-containers/src/Data/Strict/HashMap/Autogen/Internal.hs
+@@ -194,7 +194,7 @@ import Data.Coerce (coerce)
+ hash :: H.Hashable a => a -> Hash
+ hash = fromIntegral . H.hash
+ 
+-data Leaf k v = L !k v
++data Leaf k v = L !k !v
+   deriving (Eq)
+ 
+ instance (NFData k, NFData v) => NFData (Leaf k v) where

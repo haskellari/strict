@@ -1,0 +1,13 @@
+Index: strict-containers/src/Data/Strict/Map/Internal/Internal.hs
+===================================================================
+--- strict-containers.orig/src/Data/Strict/Map/Autogen/Internal.hs	2021-04-13 18:11:48.564246452 +0100
++++ strict-containers/src/Data/Strict/Map/Autogen/Internal.hs	2021-04-13 18:18:02.928716953 +0100
+@@ -479,7 +479,7 @@
+ -- their union @m1 <> m2@ maps @k@ to @a1@.
+ 
+ -- See Note: Order of constructors
+-data Map k a  = Bin {-# UNPACK #-} !Size !k a !(Map k a) !(Map k a)
++data Map k a  = Bin {-# UNPACK #-} !Size !k !a !(Map k a) !(Map k a)
+               | Tip
+ 
+ type Size     = Int

@@ -1,0 +1,87 @@
+Name:           strict-containers
+Version:        0.1
+Synopsis:       Strict containers.
+Category:       Data, Data Structures
+Description:
+    This package provides strict versions of some standard Haskell data
+    containers ('Sequence', 'Map' and 'HashMap'). The reasoning is the same as
+    that for our `strict` package - although some of these containers have
+    strict versions defined already, these only define strict *operations* and
+    the underlying data type remains the same, i.e. by default lazy.
+    .
+    As a result, the guarantees are more awkward to maintain, and furthermore
+    instances are defined lazily on the common type, meaning that external
+    utilities such as `lens` and `optics` work lazily and there is no
+    corresponding strict version at all.
+    .
+    This package defines separate data types, to avoid these problems.
+    .
+    To be clear, the "strict" vs "lazy" discussion refers to the values of a
+    map or the elements of a sequence. The "lazy" standard variants of these
+    data structures are already strict in their keys (for maps) and lengths
+    (for sequences) respectively. This is also why we don't define strict
+    variants of sets here, since the standard variants are already strict.
+    .
+    This library comes with batteries included; i.e., mirror functions and
+    instances of the lazy versions in @containers@ and @unordered-containers@.
+    Other instances are declared in other packages.
+License:        BSD3
+License-File:   LICENSE
+Maintainer:     Ximin Luo <infinity0@pwned.gg>
+Copyright:      (c) 2021 by Ximin Luo
+Homepage:       https://github.com/haskellari/strict-containers
+Cabal-Version: >= 1.10
+Build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+    -- generated list for includes
+    -- DO NOT EDIT below, AUTOGEN includes
+    -- DO NOT EDIT above, AUTOGEN includes
+
+tested-with:
+  GHC ==7.4.2
+   || ==7.6.3
+   || ==7.8.4
+   || ==7.10.3
+   || ==8.0.2
+   || ==8.2.2
+   || ==8.4.4
+   || ==8.6.5
+   || ==8.8.3
+   || ==8.10.1
+
+library
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  ghc-options:      -Wall
+
+  build-depends:
+      base                  >= 4.5.0.0  && < 5
+    , array                 >= 0.4.0.0
+    , containers            >= 0.4      && < 0.7
+    , deepseq               >= 1.2      && < 1.5
+    , hashable              >= 1.2.7.0  && < 1.4
+    , unordered-containers  >= 0.2      && < 0.3
+    , strict                >= 0.4      && < 0.5
+
+  exposed-modules:
+    Data.Strict.HashMap
+    Data.Strict.HashMap.Internal
+    -- generated list for HashMap
+    -- DO NOT EDIT below, AUTOGEN HashMap
+    -- DO NOT EDIT above, AUTOGEN HashMap
+    Data.Strict.Map
+    Data.Strict.Map.Internal
+    -- generated list for Map
+    -- DO NOT EDIT below, AUTOGEN Map
+    -- DO NOT EDIT above, AUTOGEN Map
+    Data.Strict.Sequence
+    Data.Strict.Sequence.Internal
+    -- generated list for Sequence
+    -- DO NOT EDIT below, AUTOGEN Sequence
+    -- DO NOT EDIT above, AUTOGEN Sequence
+    -- generated list for ContainersUtils
+    -- DO NOT EDIT below, AUTOGEN ContainersUtils
+    -- DO NOT EDIT above, AUTOGEN ContainersUtils
+
+  include-dirs: include

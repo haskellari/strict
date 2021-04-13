@@ -1,0 +1,52 @@
+Seq uses internal laziness for performance, but this is well-defined and our
+patch below adheres to what's needed. From the paper:
+
+"In a strict language that provides a lazy evaluation primitive, we need only
+suspend the middle subtree of each Deep node, so only Θ(log n) suspensions are
+required in a tree of size n. Even in a lazy language, some space could be
+saved in practice by ensuring that these were the only suspensions in the tree,
+for example by using Haskell’s strictness annotations." i.e. making everything
+else strict preserves the performance bounds."
+
+In other words, everything can be strict, except for the middle FingerTree
+in the Deep constructor.
+
+Index: strict-containers/src/Data/Strict/Sequence/Autogen/Internal.hs
+===================================================================
+--- strict-containers.orig/src/Data/Strict/Sequence/Autogen/Internal.hs
++++ strict-containers/src/Data/Strict/Sequence/Autogen/Internal.hs
+@ -995,7 +995,7 @@ seqDataType = mkDataType "Data.Strict.Se
+ 
+ data FingerTree a
+     = EmptyT
+-    | Single a
++    | Single !a
+     | Deep {-# UNPACK #-} !Int !(Digit a) (FingerTree (Node a)) !(Digit a)
+ #ifdef TESTING
+     deriving Show
+@@ -1184,10 +1184,10 @@ pullR s pr m = case viewRTree m of
+ -- Digits
+ 
+ data Digit a
+-    = One a
+-    | Two a a
+-    | Three a a a
+-    | Four a a a a
++    = One !a
++    | Two !a !a
++    | Three !a !a !a
++    | Four !a !a !a !a
+ #ifdef TESTING
+     deriving Show
+ #endif
+@@ -1287,8 +1287,8 @@ digitToTree' !_n (One a) = Single a
+ -- Nodes
+ 
+ data Node a
+-    = Node2 {-# UNPACK #-} !Int a a
+-    | Node3 {-# UNPACK #-} !Int a a a
++    = Node2 {-# UNPACK #-} !Int !a !a
++    | Node3 {-# UNPACK #-} !Int !a !a !a
+ #ifdef TESTING
+     deriving Show
+ #endif
