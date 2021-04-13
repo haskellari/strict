@@ -36,6 +36,7 @@ extra-source-files:
     CHANGELOG.md
     -- generated list for includes
     -- DO NOT EDIT below, AUTOGEN includes
+    include/containers.h
     -- DO NOT EDIT above, AUTOGEN includes
 
 tested-with:
@@ -69,19 +70,42 @@ library
     Data.Strict.HashMap.Internal
     -- generated list for HashMap
     -- DO NOT EDIT below, AUTOGEN HashMap
+    Data.Strict.HashMap.Autogen.Strict
+    Data.Strict.HashMap.Autogen.Internal
+    Data.Strict.HashMap.Autogen.Internal.Array
+    Data.Strict.HashMap.Autogen.Internal.Strict
+    Data.Strict.HashMap.Autogen.Internal.List
+    Data.Strict.HashMap.Autogen.Internal.Unsafe
     -- DO NOT EDIT above, AUTOGEN HashMap
     Data.Strict.Map
     Data.Strict.Map.Internal
     -- generated list for Map
     -- DO NOT EDIT below, AUTOGEN Map
+    Data.Strict.Map.Autogen.Strict
+    Data.Strict.Map.Autogen.Internal
+    Data.Strict.Map.Autogen.Merge.Strict
+    Data.Strict.Map.Autogen.Strict.Internal
+    Data.Strict.Map.Autogen.Internal.Debug
+    Data.Strict.Map.Autogen.Internal.DeprecatedShowTree
     -- DO NOT EDIT above, AUTOGEN Map
     Data.Strict.Sequence
     Data.Strict.Sequence.Internal
     -- generated list for Sequence
     -- DO NOT EDIT below, AUTOGEN Sequence
+    Data.Strict.Sequence.Autogen
+    Data.Strict.Sequence.Autogen.Internal
+    Data.Strict.Sequence.Autogen.Internal.Sorting
     -- DO NOT EDIT above, AUTOGEN Sequence
     -- generated list for ContainersUtils
     -- DO NOT EDIT below, AUTOGEN ContainersUtils
+    Data.Strict.ContainersUtils.Autogen.Coercions
+    Data.Strict.ContainersUtils.Autogen.BitUtil
+    Data.Strict.ContainersUtils.Autogen.StrictPair
+    Data.Strict.ContainersUtils.Autogen.StrictMaybe
+    Data.Strict.ContainersUtils.Autogen.PtrEquality
+    Data.Strict.ContainersUtils.Autogen.State
+    Data.Strict.ContainersUtils.Autogen.BitQueue
+    Data.Strict.ContainersUtils.Autogen.TypeError
     -- DO NOT EDIT above, AUTOGEN ContainersUtils
 
   include-dirs: include
