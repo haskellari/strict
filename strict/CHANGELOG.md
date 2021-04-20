@@ -1,7 +1,7 @@
-# 0.4.0.2
+# 0.4.0.2 -- UNRELEASED
 
-- Add flag for avoiding the `binary` dependency. This is intended for testing
-  purposes e.g. to break dependency cycles in GHC bootstrapping libraries.
+- Add a `boot` flag for a minimal dependency footprint. This is intended for
+  testing purposes e.g. to break dependency cycles in GHC bootstrapping libs.
 
 # 0.4.0.1
 
