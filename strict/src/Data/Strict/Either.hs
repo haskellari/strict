@@ -50,7 +50,9 @@ import qualified Prelude             as L
 import           Control.DeepSeq     (NFData (..))
 import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
+#ifdef MIN_VERSION_binary
 import           Data.Binary         (Binary (..))
+#endif
 import           Data.Bitraversable  (Bitraversable (..))
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
@@ -174,10 +176,12 @@ instance NFData2 Either where
   liftRnf2 rnfA rnfB = liftRnf2 rnfA rnfB . toLazy
 #endif
 
+#ifdef MIN_VERSION_binary
 -- binary
 instance (Binary a, Binary b) => Binary (Either a b) where
   put = put . toLazy
   get = toStrict <$> get
+#endif
 
 -- bifunctors
 instance Bifunctor Either where

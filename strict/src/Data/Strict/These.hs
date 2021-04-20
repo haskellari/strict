@@ -43,7 +43,9 @@ import Control.Applicative  (Applicative (..), (<$>))
 import Control.DeepSeq      (NFData (..))
 import Data.Bifoldable      (Bifoldable (..))
 import Data.Bifunctor       (Bifunctor (..))
+#ifdef MIN_VERSION_binary
 import Data.Binary          (Binary (..))
+#endif
 import Data.Bitraversable   (Bitraversable (..))
 import Data.Data            (Data, Typeable)
 import Data.Either          (partitionEithers)
@@ -401,9 +403,11 @@ instance NFData2 These where
 -- binary
 -------------------------------------------------------------------------------
 
+#ifdef MIN_VERSION_binary
 instance (Binary a, Binary b) => Binary (These a b) where
     put = put . toLazy
     get = toStrict <$> get
+#endif
 
 -------------------------------------------------------------------------------
 -- hashable

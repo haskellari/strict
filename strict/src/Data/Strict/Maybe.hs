@@ -59,7 +59,9 @@ import           Data.Traversable (Traversable (..))
 import qualified Prelude             as L
 
 import           Control.DeepSeq     (NFData (..))
+#ifdef MIN_VERSION_binary
 import           Data.Binary         (Binary (..))
+#endif
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..))
 import           GHC.Generics        (Generic)
@@ -190,10 +192,12 @@ instance NFData1 Maybe where
   liftRnf rnfA = liftRnf rnfA . toLazy
 #endif
 
+#ifdef MIN_VERSION_binary
 -- binary
 instance Binary a => Binary (Maybe a) where
   put = put . toLazy
   get = toStrict <$> get
+#endif
 
 -- hashable
 instance Hashable a => Hashable (Maybe a) where

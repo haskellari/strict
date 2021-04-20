@@ -1,3 +1,8 @@
+# 0.4.0.2
+
+- Add flag for avoiding the `binary` dependency. This is intended for testing
+  purposes e.g. to break dependency cycles in GHC bootstrapping libraries.
+
 # 0.4.0.1
 
 - Allow `bytestring-0.11`
