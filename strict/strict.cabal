@@ -103,7 +103,7 @@ library
     build-depends:
       bifunctors >= 5.5.2 && < 5.6
 
-  if flag(assoc)
+  if flag(assoc) && !flag(boot)
     build-depends: assoc >= 1.0.1 && < 1.1
 
   if !flag(boot)
