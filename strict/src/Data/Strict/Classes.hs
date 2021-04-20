@@ -29,8 +29,10 @@ import qualified Control.Monad.Trans.Writer.Lazy as L
 import qualified Control.Monad.Trans.Writer.Strict as S
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
+#ifdef MIN_VERSION_text
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as LT
+#endif
 
 -- | Ad hoc conversion between "strict" and "lazy" versions of a structure.
 --
@@ -78,9 +80,11 @@ instance Strict LBS.ByteString BS.ByteString where
   toLazy   = LBS.fromChunks . L.return {- singleton -}
 #endif
 
+#ifdef MIN_VERSION_text
 instance Strict LT.Text T.Text where
   toStrict = LT.toStrict
   toLazy   = LT.fromStrict
+#endif
 
 instance Strict (L.ST s a) (S.ST s a) where
   toStrict = L.lazyToStrictST
