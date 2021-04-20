@@ -50,8 +50,10 @@ import Data.Bitraversable   (Bitraversable (..))
 import Data.Data            (Data, Typeable)
 import Data.Either          (partitionEithers)
 import Data.Foldable        (Foldable (..))
+#ifdef MIN_VERSION_hashable
 import Data.Hashable        (Hashable (..))
 import Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
+#endif
 import Data.List.NonEmpty   (NonEmpty (..))
 import Data.Monoid          (Monoid (..))
 import Data.Semigroup       (Semigroup (..))
@@ -413,6 +415,7 @@ instance (Binary a, Binary b) => Binary (These a b) where
 -- hashable
 -------------------------------------------------------------------------------
 
+#ifdef MIN_VERSION_hashable
 instance (Hashable a, Hashable b) => Hashable (These a b) where
     hashWithSalt salt (This a) =
         salt `hashWithSalt` (0 :: Int) `hashWithSalt` a
@@ -436,3 +439,4 @@ instance Hashable2 These where
         (salt `hashWithSalt` (1 :: Int)) `hashB` b
     liftHashWithSalt2  hashA  hashB salt (These a b) =
         (salt `hashWithSalt` (2 :: Int)) `hashA` a `hashB` b
+#endif

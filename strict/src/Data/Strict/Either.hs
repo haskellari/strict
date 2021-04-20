@@ -54,8 +54,10 @@ import           Data.Bifunctor      (Bifunctor (..))
 import           Data.Binary         (Binary (..))
 #endif
 import           Data.Bitraversable  (Bitraversable (..))
+#ifdef MIN_VERSION_hashable
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
+#endif
 import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
 
@@ -203,6 +205,7 @@ instance Bitraversable Either where
   bitraverse f _ (Left a) = fmap Left (f a)
   bitraverse _ g (Right b) = fmap Right (g b)
 
+#ifdef MIN_VERSION_hashable
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Either a b) where
   hashWithSalt salt = hashWithSalt salt . toLazy
@@ -212,6 +215,7 @@ instance (Hashable a) => Hashable1 (Either a) where
 
 instance Hashable2 Either where
   liftHashWithSalt2 hashA hashB salt = liftHashWithSalt2 hashA hashB salt . toLazy
+#endif
 
 -- assoc
 #ifdef MIN_VERSION_assoc

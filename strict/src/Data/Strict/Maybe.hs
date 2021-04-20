@@ -62,8 +62,10 @@ import           Control.DeepSeq     (NFData (..))
 #ifdef MIN_VERSION_binary
 import           Data.Binary         (Binary (..))
 #endif
+#ifdef MIN_VERSION_hashable
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..))
+#endif
 import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
 
@@ -199,12 +201,14 @@ instance Binary a => Binary (Maybe a) where
   get = toStrict <$> get
 #endif
 
+#ifdef MIN_VERSION_hashable
 -- hashable
 instance Hashable a => Hashable (Maybe a) where
   hashWithSalt salt = hashWithSalt salt . toLazy
 
 instance Hashable1 Maybe where
   liftHashWithSalt hashA salt = liftHashWithSalt hashA salt . toLazy
+#endif
 
 -- Data.Functor.Classes
 #ifdef LIFTED_FUNCTOR_CLASSES
