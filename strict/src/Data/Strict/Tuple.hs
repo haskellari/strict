@@ -26,7 +26,7 @@
 -- The strict variant of the standard Haskell pairs and the corresponding
 -- variants of the functions from "Data.Tuple".
 --
--- Note that unlike regular Haskell pairs, @(x :*: _|_) = (_|_ :*: y) = _|_@
+-- Note that unlike regular Haskell pairs, @(x :!: _|_) = (_|_ :!: y) = _|_@
 --
 -----------------------------------------------------------------------------
 
