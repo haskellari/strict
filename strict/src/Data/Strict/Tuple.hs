@@ -61,10 +61,14 @@ import qualified Prelude             as L
 import           Control.DeepSeq     (NFData (..))
 import           Data.Bifoldable     (Bifoldable (..))
 import           Data.Bifunctor      (Bifunctor (..))
+#ifdef MIN_VERSION_binary
 import           Data.Binary         (Binary (..))
+#endif
 import           Data.Bitraversable  (Bitraversable (..))
+#ifdef MIN_VERSION_hashable
 import           Data.Hashable       (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
+#endif
 import           Data.Ix             (Ix (..))
 import           GHC.Generics        (Generic)
 import           Data.Data           (Data (..), Typeable)
@@ -182,10 +186,12 @@ instance NFData2 Pair where
   liftRnf2 rnfA rnfB = liftRnf2 rnfA rnfB . toLazy
 #endif
 
+#ifdef MIN_VERSION_binary
 -- binary
 instance (Binary a, Binary b) => Binary (Pair a b) where
   put = put . toLazy
   get = toStrict <$> get
+#endif
 
 -- bifunctors
 instance Bifunctor Pair where
@@ -202,6 +208,7 @@ instance Bifoldable Pair where
 instance Bitraversable Pair where
   bitraverse f g (a :!: b) = (:!:) <$> f a <*> g b
 
+#ifdef MIN_VERSION_hashable
 -- hashable
 instance (Hashable a, Hashable b) => Hashable (Pair a b) where
   hashWithSalt salt = hashWithSalt salt . toLazy
@@ -211,6 +218,7 @@ instance (Hashable a) => Hashable1 (Pair a) where
 
 instance Hashable2 Pair where
   liftHashWithSalt2 hashA hashB salt = liftHashWithSalt2 hashA hashB salt . toLazy
+#endif
 
 -- assoc
 #ifdef MIN_VERSION_assoc
