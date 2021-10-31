@@ -7,13 +7,13 @@ install-dependencies: False
 jobs-selection: any
 
 -- test that we build fine with assoc flag disabled
-constraint-set no-assoc
-  constraints: strict -assoc
-
-constraint-set lens-4
-  ghc: <9
-  constraints: lens <5
-
-constraint-set optics-0.3
-  ghc: >=8.0
-  constraints: optics-core ==0.3.*
+-- constraint-set no-assoc
+--   constraints: strict -assoc
+-- 
+-- constraint-set lens-4
+--   ghc: <9
+--   constraints: lens <5
+-- 
+-- constraint-set optics-0.3
+--   ghc: >=8.0
+--   constraints: optics-core ==0.3.*
