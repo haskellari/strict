@@ -168,7 +168,7 @@ instance (Semigroup a, Semigroup b) => Semigroup (Pair a b) where
 
 instance (Monoid a, Monoid b) => Monoid (Pair a b) where
   mempty                            = mempty :!: mempty
-  (x1 :!: y1) `mappend` (x2 :!: y2) = (x1 `mappend` x2) :!: (y1 `mappend` y2)
+  (x1 :!: y1) <> (x2 :!: y2) = (x1 <> x2) :!: (y1 <> y2)
 
 -- deepseq
 instance (NFData a, NFData b) => NFData (Pair a b) where
@@ -194,8 +194,8 @@ instance Bifunctor Pair where
   second g (a :!: b) = a :!: g b
 
 instance Bifoldable Pair where
-  bifold (a :!: b) = a `mappend` b
-  bifoldMap f g (a :!: b) = f a `mappend` g b
+  bifold (a :!: b) = a <> b
+  bifoldMap f g (a :!: b) = f a <> g b
   bifoldr f g c (a :!: b) = g b (f a c)
   bifoldl f g c (a :!: b) = g (f c a) b
 
@@ -231,7 +231,7 @@ instance Eq a => Eq1 (Pair a) where
   liftEq = liftEq2 (==)
 
 instance Ord2 Pair where
-  liftCompare2 f g (a :!: b) (a' :!: b') = f a a' `mappend` g b b'
+  liftCompare2 f g (a :!: b) (a' :!: b') = f a a' <> g b b'
 
 instance Ord a => Ord1 (Pair a) where
   liftCompare = liftCompare2 compare
