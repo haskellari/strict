@@ -1,3 +1,6 @@
+* 0.8
+  - Release adopting to strict-0.5
+
 * 0.7
   - `strict-base-types` contents have been migrated to
       - `strict >=0.4`

@@ -1,6 +1,5 @@
 name:               strict-lens
-version:            0.4.0.2
-x-revision:         2
+version:            0.4.0.3
 synopsis:           Lenses for types in strict package
 category:           Data, Lenses
 description:        Lenses for types in strict package.
@@ -19,9 +18,7 @@ homepage:           https://github.com/haskell-strict/strict
 cabal-version:      >=1.10
 build-type:         Simple
 tested-with:
-  GHC ==7.4.2
-   || ==7.6.3
-   || ==7.8.4
+  GHC ==7.8.4
    || ==7.10.3
    || ==8.0.2
    || ==8.2.2
@@ -50,9 +47,9 @@ library
       -Wnoncanonical-monadfail-instances
 
   build-depends:
-      base    >=4.5    && <5
-    , lens    >=4.19.2 && <5.3
-    , strict  >=0.4    && <0.4.1
+      base    >=4.7 && <5
+    , lens    >=5   && <5.3
+    , strict  >=0.5 && <0.6
 
   hs-source-dirs:   src
   exposed-modules:  Data.Strict.Lens

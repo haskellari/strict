@@ -8,9 +8,9 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.15.20220826
+# version: 0.15.20230313
 #
-# REGENDATA ("0.15.20220826",["github","cabal.project"])
+# REGENDATA ("0.15.20230313",["github","cabal.project"])
 #
 name: Haskell-CI
 on:
@@ -108,7 +108,7 @@ jobs:
             curl -sL https://downloads.haskell.org/ghcup/0.1.18.0/x86_64-linux-ghcup-0.1.18.0 > "$HOME/.ghcup/bin/ghcup"
             chmod a+x "$HOME/.ghcup/bin/ghcup"
             "$HOME/.ghcup/bin/ghcup" install ghc "$HCVER" || (cat "$HOME"/.ghcup/logs/*.* && false)
-            "$HOME/.ghcup/bin/ghcup" install cabal 3.6.2.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
+            "$HOME/.ghcup/bin/ghcup" install cabal 3.10.1.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
           else
             apt-add-repository -y 'ppa:hvr/ghc'
             apt-get update
@@ -116,7 +116,7 @@ jobs:
             mkdir -p "$HOME/.ghcup/bin"
             curl -sL https://downloads.haskell.org/ghcup/0.1.18.0/x86_64-linux-ghcup-0.1.18.0 > "$HOME/.ghcup/bin/ghcup"
             chmod a+x "$HOME/.ghcup/bin/ghcup"
-            "$HOME/.ghcup/bin/ghcup" install cabal 3.6.2.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
+            "$HOME/.ghcup/bin/ghcup" install cabal 3.10.1.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
           fi
         env:
           HCKIND: ${{ matrix.compilerKind }}
@@ -134,13 +134,13 @@ jobs:
             echo "HC=$HC" >> "$GITHUB_ENV"
             echo "HCPKG=$HOME/.ghcup/bin/$HCKIND-pkg-$HCVER" >> "$GITHUB_ENV"
             echo "HADDOCK=$HOME/.ghcup/bin/haddock-$HCVER" >> "$GITHUB_ENV"
-            echo "CABAL=$HOME/.ghcup/bin/cabal-3.6.2.0 -vnormal+nowrap" >> "$GITHUB_ENV"
+            echo "CABAL=$HOME/.ghcup/bin/cabal-3.10.1.0 -vnormal+nowrap" >> "$GITHUB_ENV"
           else
             HC=$HCDIR/bin/$HCKIND
             echo "HC=$HC" >> "$GITHUB_ENV"
             echo "HCPKG=$HCDIR/bin/$HCKIND-pkg" >> "$GITHUB_ENV"
             echo "HADDOCK=$HCDIR/bin/haddock" >> "$GITHUB_ENV"
-            echo "CABAL=$HOME/.ghcup/bin/cabal-3.6.2.0 -vnormal+nowrap" >> "$GITHUB_ENV"
+            echo "CABAL=$HOME/.ghcup/bin/cabal-3.10.1.0 -vnormal+nowrap" >> "$GITHUB_ENV"
           fi
 
           HCNUMVER=$(${HC} --numeric-version|perl -ne '/^(\d+)\.(\d+)\.(\d+)(\.(\d+))?$/; print(10000 * $1 + 100 * $2 + ($3 == 0 ? $5 != 1 : $3))')
@@ -199,14 +199,14 @@ jobs:
           chmod a+x $HOME/.cabal/bin/cabal-plan
           cabal-plan --version
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: source
       - name: initial cabal.project for sdist
         run: |
           touch cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/strict" >> cabal.project
-          echo "packages: $GITHUB_WORKSPACE/source/strict-lens" >> cabal.project
+          if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then echo "packages: $GITHUB_WORKSPACE/source/strict-lens" >> cabal.project ; fi
           if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then echo "packages: $GITHUB_WORKSPACE/source/strict-base-types" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80000)) -ne 0 ] ; then echo "packages: $GITHUB_WORKSPACE/source/strict-optics" >> cabal.project ; fi
           cat cabal.project
@@ -232,7 +232,7 @@ jobs:
           touch cabal.project
           touch cabal.project.local
           echo "packages: ${PKGDIR_strict}" >> cabal.project
-          echo "packages: ${PKGDIR_strict_lens}" >> cabal.project
+          if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then echo "packages: ${PKGDIR_strict_lens}" >> cabal.project ; fi
           if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then echo "packages: ${PKGDIR_strict_base_types}" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80000)) -ne 0 ] ; then echo "packages: ${PKGDIR_strict_optics}" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package strict" >> cabal.project ; fi
@@ -244,6 +244,16 @@ jobs:
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package strict-optics" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           cat >> cabal.project <<EOF
+          packages:
+            https://hackage.haskell.org/package/these-1.2/candidate/these-1.2.tar.gz
+
+          packages:
+            https://hackage.haskell.org/package/semialign-1.3/candidate/semialign-1.3.tar.gz
+
+          allow-newer: *:strict
+          allow-newer: *:these
+          allow-newer: *:assoc
+          allow-newer: *:semialign
           EOF
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(strict|strict-base-types|strict-lens|strict-optics)$/; }' >> cabal.project.local
           cat cabal.project
@@ -252,8 +262,8 @@ jobs:
         run: |
           $CABAL v2-build $ARG_COMPILER $ARG_TESTS $ARG_BENCH --dry-run all
           cabal-plan
-      - name: cache
-        uses: actions/cache@v2
+      - name: restore cache
+        uses: actions/cache/restore@v3
         with:
           key: ${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
           path: ~/.cabal/store
@@ -268,16 +278,22 @@ jobs:
         run: |
           cd ${PKGDIR_strict} || false
           ${CABAL} -vnormal check
-          cd ${PKGDIR_strict_lens} || false
-          ${CABAL} -vnormal check
+          if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then cd ${PKGDIR_strict_lens} || false ; fi
+          if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then ${CABAL} -vnormal check ; fi
           if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then cd ${PKGDIR_strict_base_types} || false ; fi
           if [ $((HCNUMVER >= 70800)) -ne 0 ] ; then ${CABAL} -vnormal check ; fi
           if [ $((HCNUMVER >= 80000)) -ne 0 ] ; then cd ${PKGDIR_strict_optics} || false ; fi
           if [ $((HCNUMVER >= 80000)) -ne 0 ] ; then ${CABAL} -vnormal check ; fi
       - name: haddock
         run: |
-          $CABAL v2-haddock --haddock-all $ARG_COMPILER --with-haddock $HADDOCK $ARG_TESTS $ARG_BENCH all
+          $CABAL v2-haddock --disable-documentation --haddock-all $ARG_COMPILER --with-haddock $HADDOCK $ARG_TESTS $ARG_BENCH all
       - name: unconstrained build
         run: |
           rm -f cabal.project.local
           $CABAL v2-build $ARG_COMPILER --disable-tests --disable-benchmarks all
+      - name: save cache
+        uses: actions/cache/save@v3
+        if: always()
+        with:
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+          path: ~/.cabal/store
