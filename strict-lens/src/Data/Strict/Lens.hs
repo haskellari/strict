@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                   #-}
 {-# LANGUAGE DeriveDataTypeable    #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -6,8 +5,6 @@
 {-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE UndecidableInstances  #-}
-
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Strict.Lens (
     -- * Tuple
     -- | See instances, in particular for 'Field1' and 'Field2' type classes.
@@ -33,35 +30,9 @@ import           Control.Lens        (Index, Prism, Prism', Traversal, prism,
 import           Data.Strict         (Either (..), Maybe (..), Pair (..),
                                       These (..), either, maybe, these)
 
-#if !MIN_VERSION_lens(5,0,0)
-import           Control.Applicative ((<*>))
-import           Control.Lens        (Each (..), Field1 (..), Field2 (..),
-                                      Swapped (..), indexed, iso, (<&>))
-import qualified Control.Lens        as L
-import           Data.Strict         (Strict (..), swap)
-#endif
-
 -------------------------------------------------------------------------------
 -- Tuple
 -------------------------------------------------------------------------------
-
-#if !MIN_VERSION_lens(5,0,0)
-instance Field1 (Pair a b) (Pair a' b) a a' where
-  _1 k (a :!: b) = indexed k (0 :: Int) a <&> \a' -> (a' :!: b)
-
-instance Field2 (Pair a b) (Pair a b') b b' where
-  _2 k (a :!: b) = indexed k (1 :: Int) b <&> \b' -> (a :!: b')
-
-instance L.Strict (a, b) (Pair a b) where
-  strict = iso toStrict toLazy
-
-instance Swapped Pair where
-  swapped = iso swap swap
-
-instance (a~a', b~b') => Each (Pair a a') (Pair b b') a b where
-  each f ~(a :!: b) = (:!:) <$> f a <*> f b
-  {-# INLINE each #-}
-#endif
 
 -- TODO: this should be removed. Probably.
 type instance Index (Pair a b) = Int
@@ -69,18 +40,6 @@ type instance Index (Pair a b) = Int
 -------------------------------------------------------------------------------
 -- Either
 -------------------------------------------------------------------------------
-
-#if !MIN_VERSION_lens(5,0,0)
-instance L.Strict (L.Either a b) (Either a b) where
-  strict = iso toStrict toLazy
-
-instance Swapped Either where
-  swapped = either Right Left `iso` either Right Left
-
-instance (a ~ a', b ~ b') => Each (Either a a') (Either b b') a b where
-  each f (Left x)  = Left <$> f x
-  each f (Right x) = Right <$> f x
-#endif
 
 -- | Analogous to 'Control.Lens.Prism._Left' in "Control.Lens.Prism".
 _Left :: Prism (Either a c) (Either b c) a b
@@ -94,13 +53,6 @@ _Right = prism Right $ either (L.Left . Left) L.Right
 -- Maybe
 -------------------------------------------------------------------------------
 
-#if !MIN_VERSION_lens(5,0,0)
-instance L.Strict (L.Maybe a) (Maybe a) where
-  strict = iso toStrict toLazy
-
-instance Each (Maybe a) (Maybe b) a b
-#endif
-
 -- | Analogous to 'Control.Lens.Prism._Just' in "Control.Lens.Prism"
 _Just :: Prism (Maybe a) (Maybe b) a b
 _Just = prism Just $ maybe (L.Left Nothing) L.Right
@@ -112,21 +64,6 @@ _Nothing = prism' (L.const Nothing) $ maybe (L.Just ()) (L.const L.Nothing)
 -------------------------------------------------------------------------------
 -- These
 -------------------------------------------------------------------------------
-
-#if !MIN_VERSION_lens(5,0,0)
-instance Swapped These where
-    swapped = iso swapThese swapThese
-
-swapThese :: These a b -> These b a
-swapThese (This a)    = That a
-swapThese (That b)    = This b
-swapThese (These a b) = These b a
-
-instance (a ~ a', b ~ b') => Each (These a a') (These b b') a b where
-    each f (This a)    = This <$> f a
-    each f (That b)    = That <$> f b
-    each f (These a b) = These <$> f a <*> f b
-#endif
 
 -- | A 'Control.Lens.Traversal' of the first half of a 'These', suitable for use with "Control.Lens".
 --

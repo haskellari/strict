@@ -1,6 +1,5 @@
 name:               strict-base-types
-version:            0.7
-x-revision:         2
+version:            0.8
 synopsis:           Strict variants of the types provided in base.
 category:           Data
 description:
@@ -51,7 +50,7 @@ library
       aeson                 >=1.5.3.0 && <1.6 || >=2.0 && <2.2
     , base                  >=4.7     && <5
     , quickcheck-instances  >=0.3.24  && <0.4
-    , strict                >=0.4     && <0.4.1
+    , strict                >=0.5     && <0.5.1
     , strict-lens           >=0.4     && <0.5
 
   hs-source-dirs:   src

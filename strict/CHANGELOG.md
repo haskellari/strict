@@ -1,3 +1,9 @@
+# 0.5
+
+- Depend on `bifunctor-classes-compat` instead of `bifunctors`
+  See changelog note in `bifunctors-5.6`: https://hackage.haskell.org/package/bifunctors-5.6/changelog
+  This is breaking change, but affects only GHC-8.0 and older users.
+
 # 0.4.0.1
 
 - Allow `bytestring-0.11`

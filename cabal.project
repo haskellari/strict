@@ -2,3 +2,11 @@ packages: strict/
 packages: strict-lens/
 packages: strict-base-types/
 packages: strict-optics/
+
+packages: https://hackage.haskell.org/package/these-1.2/candidate/these-1.2.tar.gz
+packages: https://hackage.haskell.org/package/semialign-1.3/candidate/semialign-1.3.tar.gz
+
+allow-newer: *:strict
+allow-newer: *:these
+allow-newer: *:assoc
+allow-newer: *:semialign
