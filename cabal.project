@@ -2,8 +2,3 @@ packages: strict/
 packages: strict-lens/
 packages: strict-base-types/
 packages: strict-optics/
-
-allow-newer: *:strict
-allow-newer: *:these
-allow-newer: *:assoc
-allow-newer: *:semialign
