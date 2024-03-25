@@ -22,7 +22,7 @@
 -- corresponding variants of the functions from "Data.Maybe".
 --
 -- Note that in contrast to the standard lazy 'L.Maybe' type, the strict
--- 'Maybe' type does not have lawful functor, applicative, or monad instances.
+-- 'Maybe' type does not have lawful 'Functor', 'Applicative', or 'Monad' instances.
 -- However, we provide instances for these type classes (and related others)
 -- since they are only partial due to the below example.
 --
