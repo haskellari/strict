@@ -54,10 +54,10 @@ module Data.Strict.Maybe (
 ) where
 
 -- import parts explicitly, helps with compatibility
-import           Prelude (Functor (..), Monad(..), Eq (..), Ord (..), Show (..), Read (..), Bool (..), (.)
-                         ,error, Ordering (..), ($), showString, showParen, return, lex, readParen)
+import           Prelude (Functor (..), Eq (..), Ord (..), Show (..), Read (..), Bool (..), (.)
+                         ,error, Ordering (..), ($), showString, showParen, lex, readParen)
 import           Control.Applicative (Applicative (..), Alternative (..), (<$>))
-import           Control.Monad (MonadPlus (..))
+import           Control.Monad (Monad (..), MonadPlus (..))
 import           Data.Monoid (Monoid (..))
 import           Data.Semigroup (Semigroup (..))
 import           Data.Foldable (Foldable (..))

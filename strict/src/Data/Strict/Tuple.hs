@@ -48,8 +48,9 @@ module Data.Strict.Tuple (
 
 -- import parts explicitly, helps with compatibility
 import           Prelude (Functor (..), Eq (..), Ord (..), Show (..), Read (..), (.), Bounded, map, ($)
-                         , (&&), showParen, showString, readParen, lex, return)
-import           Control.Applicative ((<$>), (<*>))
+                         , (&&), showParen, showString, readParen, lex)
+import           Control.Applicative (Applicative (..), (<$>), (<*>))
+import           Control.Monad (Monad (..))
 import           Data.Monoid (Monoid (..))
 import           Data.Semigroup (Semigroup (..))
 import           Data.Foldable (Foldable (..))
@@ -169,6 +170,16 @@ instance (Semigroup a, Semigroup b) => Semigroup (Pair a b) where
 instance (Monoid a, Monoid b) => Monoid (Pair a b) where
   mempty                            = mempty :!: mempty
   (x1 :!: y1) `mappend` (x2 :!: y2) = (x1 `mappend` x2) :!: (y1 `mappend` y2)
+
+instance Monoid l => Applicative (Pair l) where
+  pure = (mempty :!:)
+  (u :!: f) <*> (v :!: x) = (u <> v) :!: f x
+  liftA2 f (u :!: x) (v :!: y) = (u <> v) :!: f x y
+
+instance Monoid l => Monad (Pair l) where
+  (u :!: a) >>= k = case k a of (v :!: b) -> (u <> v) :!: b
+
+  return = pure
 
 -- deepseq
 instance (NFData a, NFData b) => NFData (Pair a b) where
