@@ -19,7 +19,10 @@
 -- corresponding variants of the functions from "Data.Maybe".
 --
 -- Note that in contrast to the standard lazy 'L.Maybe' type, the strict
--- 'Maybe' type is not an applicative functor, and therefore also not a monad.
+-- 'Maybe' type does not have lawful functor, applicative, or monad instances.
+-- However, we provide instances for these type classes (and related others)
+-- since they are only partial due to the below example.
+--
 -- The problem is the /homomorphism/ law, which states that
 --
 --      @'pure' f '<*>' 'pure' x = 'pure' (f x)  -- must hold for all f@
@@ -27,6 +30,10 @@
 -- This law does not hold for the expected applicative functor instance of
 -- 'Maybe', as this instance does not satisfy @pure f \<*\> pure _|_ = pure (f
 -- _|_)@ for @f = const@.
+--
+-- Many consider this hole in the lawfulness to be unuseful, however, as _|_ is
+-- rarely used and if one is using _|_ with strict types you'd expect the program
+-- to error immediately.
 --
 -----------------------------------------------------------------------------
 
