@@ -1,3 +1,7 @@
+# 0.5.0.1
+
+- Add partially lawful instances for Applicative, Monad, and related typeclasses
+
 # 0.5
 
 - Depend on `bifunctor-classes-compat` instead of `bifunctors`
