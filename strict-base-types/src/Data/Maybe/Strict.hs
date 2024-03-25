@@ -31,9 +31,7 @@
 -- 'Maybe', as this instance does not satisfy @pure f \<*\> pure _|_ = pure (f
 -- _|_)@ for @f = const@.
 --
--- Many consider this hole in the lawfulness to be unuseful, however, as _|_ is
--- rarely used and if one is using _|_ with strict types you'd expect the program
--- to error immediately.
+-- This exception to the law is acceptable because we would expect a strict type to diverge on _|_ .
 --
 -----------------------------------------------------------------------------
 
