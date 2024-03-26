@@ -1,5 +1,5 @@
 Name:           strict
-Version:        0.5.0.1
+Version:        0.5
 x-revision:     1
 Synopsis:       Strict data types and String IO.
 Category:       Data, System
