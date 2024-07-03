@@ -3,9 +3,6 @@ branches: master
 -- we have inplace dependencies
 install-dependencies: False
 
--- to allow different set of packages per GHC versions
-jobs-selection: any
-
 -- Don't use head.hackage
 head-hackage: False
 

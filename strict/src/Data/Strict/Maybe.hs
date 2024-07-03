@@ -1,19 +1,6 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
-
-#if MIN_VERSION_base(4,9,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers(0,5,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers_compat(0,5,0) && !MIN_VERSION_transformers(0,4,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#endif
-#endif
-#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -58,35 +45,18 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
-import           Control.DeepSeq     (NFData (..))
-import           Data.Binary         (Binary (..))
-import           Data.Hashable       (Hashable(..))
+import           Control.DeepSeq      (NFData (..), NFData1 (..))
+import           Data.Binary          (Binary (..))
+import           Data.Data            (Data (..), Typeable)
+import           Data.Hashable        (Hashable(..))
 import           Data.Hashable.Lifted (Hashable1 (..))
-import           GHC.Generics        (Generic)
-import           Data.Data           (Data (..), Typeable)
+import           GHC.Generics         (Generic, Generic1)
 
-
-#if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic1)
-#endif
-
-#if MIN_VERSION_deepseq(1,4,3)
-import Control.DeepSeq (NFData1 (..))
-#endif
-
-#ifdef LIFTED_FUNCTOR_CLASSES
 import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
-#else
-import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
-#endif
 
 -- | The type of strict optional values.
 data Maybe a = Nothing | Just !a
-  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
-#if __GLASGOW_HASKELL__ >= 706
-    , Generic1
-#endif
-    )
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Generic1)
 
 toStrict :: L.Maybe a -> Maybe a
 toStrict L.Nothing  = Nothing
@@ -157,17 +127,8 @@ instance Semigroup a => Semigroup (Maybe a) where
   m       <> Nothing = m
   Just x1 <> Just x2 = Just (x1 <> x2)
 
-#if MIN_VERSION_base(4,11,0)
 instance Semigroup a => Monoid (Maybe a) where
   mempty = Nothing
-#else
-instance Monoid a => Monoid (Maybe a) where
-  mempty = Nothing
-
-  Nothing `mappend` m       = m
-  m       `mappend` Nothing = m
-  Just x1 `mappend` Just x2 = Just (x1 `mappend` x2)
-#endif
 
 instance Functor Maybe where
   fmap _ Nothing  = Nothing
@@ -185,10 +146,8 @@ instance Traversable Maybe where
 instance NFData a => NFData (Maybe a) where
   rnf = rnf . toLazy
 
-#if MIN_VERSION_deepseq(1,4,3)
 instance NFData1 Maybe where
   liftRnf rnfA = liftRnf rnfA . toLazy
-#endif
 
 -- binary
 instance Binary a => Binary (Maybe a) where
@@ -203,8 +162,6 @@ instance Hashable1 Maybe where
   liftHashWithSalt hashA salt = liftHashWithSalt hashA salt . toLazy
 
 -- Data.Functor.Classes
-#ifdef LIFTED_FUNCTOR_CLASSES
-
 instance Eq1 Maybe where
   liftEq f (Just a) (Just a') = f a a'
   liftEq _ Nothing  Nothing   = True
@@ -232,10 +189,3 @@ instance Read1 Maybe where
           (a, s2) <- ra 11 s1
           return (Just a, s2)
         _         -> []
-
-#else
-instance Eq1   Maybe where eq1        = (==)
-instance Ord1  Maybe where compare1   = compare
-instance Show1 Maybe where showsPrec1 = showsPrec
-instance Read1 Maybe where readsPrec1 = readsPrec
-#endif
