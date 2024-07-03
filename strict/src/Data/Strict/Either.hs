@@ -1,19 +1,6 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
-
-#if MIN_VERSION_base(4,9,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers(0,5,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers_compat(0,5,0) && !MIN_VERSION_transformers(0,4,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#endif
-#endif
-#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -47,44 +34,25 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
-import           Control.DeepSeq     (NFData (..))
-import           Data.Bifoldable     (Bifoldable (..))
-import           Data.Bifunctor      (Bifunctor (..))
-import           Data.Binary         (Binary (..))
-import           Data.Bitraversable  (Bitraversable (..))
-import           Data.Hashable       (Hashable(..))
-import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
-import           GHC.Generics        (Generic)
-import           Data.Data           (Data (..), Typeable)
-
-#if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic1)
-#endif
-
-#if MIN_VERSION_deepseq(1,4,3)
-import Control.DeepSeq (NFData1 (..), NFData2 (..))
-#endif
-
-#ifdef MIN_VERSION_assoc
+import           Control.DeepSeq      (NFData (..), NFData1 (..), NFData2 (..))
+import           Data.Bifoldable      (Bifoldable (..))
+import           Data.Bifunctor       (Bifunctor (..))
 import           Data.Bifunctor.Assoc (Assoc (..))
 import           Data.Bifunctor.Swap  (Swap (..))
-#endif
+import           Data.Binary          (Binary (..))
+import           Data.Bitraversable   (Bitraversable (..))
+import           Data.Data            (Data (..), Typeable)
+import           Data.Hashable        (Hashable(..))
+import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
+import           GHC.Generics         (Generic, Generic1)
 
-#ifdef LIFTED_FUNCTOR_CLASSES
 import Data.Functor.Classes
        (Eq1 (..), Eq2 (..), Ord1 (..), Ord2 (..), Read1 (..), Read2 (..),
        Show1 (..), Show2 (..))
-#else
-import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
-#endif
 
 -- | The strict choice type.
 data Either a b = Left !a | Right !b
-  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
-#if __GLASGOW_HASKELL__ >= 706
-    , Generic1
-#endif
-    )
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Generic1)
 
 toStrict :: L.Either a b -> Either a b
 toStrict (L.Left x)  = Left x
@@ -166,13 +134,11 @@ instance Semigroup (Either a b) where
 instance (NFData a, NFData b) => NFData (Either a b) where
   rnf = rnf . toLazy
 
-#if MIN_VERSION_deepseq(1,4,3)
 instance (NFData a) => NFData1 (Either a) where
   liftRnf rnfA = liftRnf rnfA . toLazy
 
 instance NFData2 Either where
   liftRnf2 rnfA rnfB = liftRnf2 rnfA rnfB . toLazy
-#endif
 
 -- binary
 instance (Binary a, Binary b) => Binary (Either a b) where
@@ -210,7 +176,6 @@ instance Hashable2 Either where
   liftHashWithSalt2 hashA hashB salt = liftHashWithSalt2 hashA hashB salt . toLazy
 
 -- assoc
-#ifdef MIN_VERSION_assoc
 instance Assoc Either where
     assoc (Left (Left a))  = Left a
     assoc (Left (Right b)) = Right (Left b)
@@ -223,10 +188,8 @@ instance Assoc Either where
 instance Swap Either where
     swap (Left x) = Right x
     swap (Right x) = Left x
-#endif
 
 -- Data.Functor.Classes
-#ifdef LIFTED_FUNCTOR_CLASSES
 instance Eq2 Either where
   liftEq2 f _ (Left a)  (Left a')  = f a a'
   liftEq2 _ g (Right b) (Right b') = g b b'
@@ -271,9 +234,3 @@ instance Read2 Either where
 
 instance Read a => Read1 (Either a) where
   liftReadsPrec = liftReadsPrec2 readsPrec readList
-#else
-instance Eq a   => Eq1   (Either a) where eq1        = (==)
-instance Ord a  => Ord1  (Either a) where compare1   = compare
-instance Show a => Show1 (Either a) where showsPrec1 = showsPrec
-instance Read a => Read1 (Either a) where readsPrec1 = readsPrec
-#endif

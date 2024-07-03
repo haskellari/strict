@@ -1,20 +1,7 @@
-{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE Safe               #-}
-
-#if MIN_VERSION_base(4,9,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers(0,5,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers_compat(0,5,0) && !MIN_VERSION_transformers(0,4,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#endif
-#endif
-#endif
 
 module Data.Strict.These (
       These(..)
@@ -62,37 +49,21 @@ import Prelude
 
 import qualified Data.These as L
 
-#if MIN_VERSION_deepseq(1,4,3)
 import Control.DeepSeq (NFData1 (..), NFData2 (..))
-#endif
-
-#if __GLASGOW_HASKELL__ >= 706
 import GHC.Generics (Generic1)
-#endif
-
-#ifdef MIN_VERSION_assoc
 import Data.Bifunctor.Assoc (Assoc (..))
 import Data.Bifunctor.Swap  (Swap (..))
-#endif
 
-#ifdef LIFTED_FUNCTOR_CLASSES
 import Data.Functor.Classes
        (Eq1 (..), Eq2 (..), Ord1 (..), Ord2 (..), Read1 (..), Read2 (..),
        Show1 (..), Show2 (..))
-#else
-import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
-#endif
 
 -- $setup
 -- >>> import Prelude (map)
 
 -- | The strict these type.
 data These a b = This !a | That !b | These !a !b
-  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic
-#if __GLASGOW_HASKELL__ >= 706
-    , Generic1
-#endif
-    )
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Generic1)
 
 toStrict :: L.These a b -> These a b
 toStrict (L.This x)    = This x
@@ -282,7 +253,6 @@ instance (Semigroup a) => Monad (These a) where
 -- Data.Functor.Classes
 -------------------------------------------------------------------------------
 
-#ifdef LIFTED_FUNCTOR_CLASSES
 instance Eq2 These where
   liftEq2 f _ (This a)    (This a')     = f a a'
   liftEq2 _ g (That b)    (That b')     = g b b'
@@ -341,18 +311,10 @@ instance Read2 These where
 instance Read a => Read1 (These a) where
   liftReadsPrec = liftReadsPrec2 readsPrec readList
 
-#else
-instance Eq a   => Eq1   (These a) where eq1        = (==)
-instance Ord a  => Ord1  (These a) where compare1   = compare
-instance Show a => Show1 (These a) where showsPrec1 = showsPrec
-instance Read a => Read1 (These a) where readsPrec1 = readsPrec
-#endif
-
 -------------------------------------------------------------------------------
 -- assoc
 -------------------------------------------------------------------------------
 
-#ifdef MIN_VERSION_assoc
 instance Swap These where
     swap (This a)    = That a
     swap (That b)    = This b
@@ -374,7 +336,6 @@ instance Assoc These where
     unassoc (These a (This b))    = This (These a b)
     unassoc (These a (That c))    = These (This a) c
     unassoc (These a (These b c)) = These (These a b) c
-#endif
 
 -------------------------------------------------------------------------------
 -- deepseq
@@ -385,7 +346,6 @@ instance (NFData a, NFData b) => NFData (These a b) where
     rnf (That b)    = rnf b
     rnf (These a b) = rnf a `seq` rnf b
 
-#if MIN_VERSION_deepseq(1,4,3)
 instance NFData a => NFData1 (These a) where
     liftRnf _rnfB (This a)    = rnf a
     liftRnf  rnfB (That b)    = rnfB b
@@ -395,7 +355,6 @@ instance NFData2 These where
     liftRnf2  rnfA _rnfB (This a)    = rnfA a
     liftRnf2 _rnfA  rnfB (That b)    = rnfB b
     liftRnf2  rnfA  rnfB (These a b) = rnfA a `seq` rnfB b
-#endif
 
 -------------------------------------------------------------------------------
 -- binary

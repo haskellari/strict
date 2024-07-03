@@ -1,10 +1,5 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE FunctionalDependencies #-}
-#if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE Safe #-}
-#else
-{-# LANGUAGE Trustworthy #-}
-#endif
 
 module Data.Strict.Classes (
     Strict (..),
@@ -70,13 +65,8 @@ instance Strict (L.These a b) (These a b) where
   toLazy (These x y) = L.These x y
 
 instance Strict LBS.ByteString BS.ByteString where
-#if MIN_VERSION_bytestring(0,10,0)
   toStrict = LBS.toStrict
   toLazy   = LBS.fromStrict
-#else
-  toStrict = BS.concat . LBS.toChunks
-  toLazy   = LBS.fromChunks . L.return {- singleton -}
-#endif
 
 instance Strict LT.Text T.Text where
   toStrict = LT.toStrict

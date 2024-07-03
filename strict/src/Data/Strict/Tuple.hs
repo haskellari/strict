@@ -1,24 +1,8 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE Safe #-}
 {-# LANGUAGE DeriveGeneric      #-}
-#ifndef __HADDOCK__
-#ifdef __GLASGOW_HASKELL__
 {-# LANGUAGE TypeOperators      #-}
-#endif
-#endif
 
-#if MIN_VERSION_base(4,9,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers(0,5,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#else
-#if MIN_VERSION_transformers_compat(0,5,0) && !MIN_VERSION_transformers(0,4,0)
-#define LIFTED_FUNCTOR_CLASSES 1
-#endif
-#endif
-#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -32,11 +16,7 @@
 
 module Data.Strict.Tuple (
     Pair(..)
-#ifndef __HADDOCK__
-#ifdef __GLASGOW_HASKELL__
-  , (:!:)
-#endif
-#endif
+  , type (:!:)
   , fst
   , snd
   , curry
@@ -58,41 +38,22 @@ import           Data.Traversable (Traversable (..))
 -- Lazy variants
 import qualified Prelude             as L
 
-import           Control.DeepSeq     (NFData (..))
-import           Data.Bifoldable     (Bifoldable (..))
-import           Data.Bifunctor      (Bifunctor (..))
-import           Data.Binary         (Binary (..))
-import           Data.Bitraversable  (Bitraversable (..))
-import           Data.Hashable       (Hashable(..))
-import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
-import           Data.Ix             (Ix (..))
-import           GHC.Generics        (Generic)
-import           Data.Data           (Data (..), Typeable)
-
-#if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics        (Generic1)
-#endif
-
-#if MIN_VERSION_deepseq(1,4,3)
-import Control.DeepSeq (NFData1 (..), NFData2 (..))
-#endif
-
-#ifdef MIN_VERSION_assoc
+import           Control.DeepSeq      (NFData (..), NFData1 (..), NFData2 (..))
+import           Data.Bifoldable      (Bifoldable (..))
+import           Data.Bifunctor       (Bifunctor (..))
 import           Data.Bifunctor.Assoc (Assoc (..))
 import           Data.Bifunctor.Swap  (Swap (..))
-#endif
+import           Data.Binary          (Binary (..))
+import           Data.Bitraversable   (Bitraversable (..))
+import           Data.Data            (Data (..), Typeable)
+import           Data.Hashable        (Hashable(..))
+import           Data.Hashable.Lifted (Hashable1 (..), Hashable2 (..))
+import           Data.Ix              (Ix (..))
+import           GHC.Generics         (Generic, Generic1)
 
-#ifdef LIFTED_FUNCTOR_CLASSES
 import Data.Functor.Classes
        (Eq1 (..), Eq2 (..), Ord1 (..), Ord2 (..), Read1 (..), Read2 (..),
        Show1 (..), Show2 (..))
-#else
-import Data.Functor.Classes (Eq1 (..), Ord1 (..), Read1 (..), Show1 (..))
-#endif
-
-#if __HADDOCK__
-import Data.Tuple ()
-#endif
 
 -- $setup
 -- >>> import Prelude (Char, String)
@@ -102,18 +63,10 @@ infix 2 :!:
 
 -- | The type of strict pairs.
 data Pair a b = !a :!: !b
-  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Bounded, Ix
-#if __GLASGOW_HASKELL__ >= 706
-    , Generic1
-#endif
-    )
+  deriving (Eq, Ord, Read, Show, Typeable, Data, Generic, Bounded, Ix, Generic1)
 
-#ifndef __HADDOCK__
-#ifdef __GLASGOW_HASKELL__
 -- This gives a nicer syntax for the type but only works in GHC for now.
 type (:!:) = Pair
-#endif
-#endif
 
 toStrict :: (a, b) -> Pair a b
 toStrict (a, b) = a :!: b
@@ -174,13 +127,11 @@ instance (Monoid a, Monoid b) => Monoid (Pair a b) where
 instance (NFData a, NFData b) => NFData (Pair a b) where
   rnf = rnf . toLazy
 
-#if MIN_VERSION_deepseq(1,4,3)
 instance (NFData a) => NFData1 (Pair a) where
   liftRnf rnfA = liftRnf rnfA . toLazy
 
 instance NFData2 Pair where
   liftRnf2 rnfA rnfB = liftRnf2 rnfA rnfB . toLazy
-#endif
 
 -- binary
 instance (Binary a, Binary b) => Binary (Pair a b) where
@@ -213,17 +164,14 @@ instance Hashable2 Pair where
   liftHashWithSalt2 hashA hashB salt = liftHashWithSalt2 hashA hashB salt . toLazy
 
 -- assoc
-#ifdef MIN_VERSION_assoc
 instance Assoc Pair where
     assoc ((a :!: b) :!: c) = (a :!: (b :!: c))
     unassoc (a :!: (b :!: c)) = ((a :!: b) :!: c)
 
 instance Swap Pair where
     swap = Data.Strict.Tuple.swap
-#endif
 
 -- Data.Functor.Classes
-#ifdef LIFTED_FUNCTOR_CLASSES
 instance Eq2 Pair where
   liftEq2 f g (a :!: b) (a' :!: b')  = f a a' && g b b'
 
@@ -265,9 +213,3 @@ instance Read2 Pair where
 
 instance Read a => Read1 (Pair a) where
   liftReadsPrec = liftReadsPrec2 readsPrec readList
-#else
-instance Eq a   => Eq1   (Pair a) where eq1        = (==)
-instance Ord a  => Ord1  (Pair a) where compare1   = compare
-instance Show a => Show1 (Pair a) where showsPrec1 = showsPrec
-instance Read a => Read1 (Pair a) where readsPrec1 = readsPrec
-#endif
