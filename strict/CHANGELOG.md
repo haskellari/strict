@@ -1,3 +1,7 @@
+# 0.5.1
+
+- Support GHC-8.6.5...GHC-9.10.1
+
 # 0.5
 
 - Depend on `bifunctor-classes-compat` instead of `bifunctors`

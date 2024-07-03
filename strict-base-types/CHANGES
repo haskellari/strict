@@ -1,3 +1,6 @@
+* 0.8.1
+  - Support GHC-8.6.5...9.10.1
+
 * 0.8
   - Release adopting to strict-0.5
 
