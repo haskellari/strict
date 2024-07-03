@@ -8,9 +8,10 @@
 -- The strict variant of the standard Haskell 'L.Either' type and the
 -- corresponding variants of the functions from "Data.Either".
 --
--- Note that the strict 'Either' type is not an applicative functor, and
+-- Note that the strict 'Either' type is not technically an applicative functor, and
 -- therefore also no monad. The reasons are the same as the ones for the
--- strict @Maybe@ type, which are explained in "Data.Maybe.Strict".
+-- strict @Maybe@ type, which are explained in "Data.Maybe.Strict", but we define
+-- instances for the same reasons listed as well.
 --
 -----------------------------------------------------------------------------
 
@@ -25,8 +26,9 @@ module Data.Strict.Either (
 
 -- import parts explicitly, helps with compatibility
 import           Prelude ( Functor (..), Eq (..), Ord (..), Show (..), Read (..), Bool (..), (.), ($)
-                         , error, Ordering (..), showParen, showString, lex, return, readParen)
-import           Control.Applicative (pure, (<$>))
+                         , error, Ordering (..), showParen, showString, lex, readParen)
+import           Control.Applicative (Applicative (..), (<$>))
+import           Control.Monad (Monad (..))
 import           Data.Semigroup (Semigroup (..))
 import           Data.Foldable (Foldable (..))
 import           Data.Traversable (Traversable (..))
@@ -129,6 +131,21 @@ instance Traversable (Either e) where
 instance Semigroup (Either a b) where
   Left _ <> b = b
   a      <> _ = a
+
+-- | Unlawful when given `Right _|_`, due to the homomorphism law
+instance Applicative (Either e) where
+  pure = Right
+
+  Right f <*> m = fmap f m
+  Left l <*> _m  = Left l
+
+instance Monad (Either e) where
+  (Right x) >>= k = k x
+  Left e  >>= _   = Left e
+
+  (>>) = (*>)
+
+  return = pure
 
 -- deepseq
 instance (NFData a, NFData b) => NFData (Either a b) where

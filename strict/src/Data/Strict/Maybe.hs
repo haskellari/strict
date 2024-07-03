@@ -9,7 +9,10 @@
 -- corresponding variants of the functions from "Data.Maybe".
 --
 -- Note that in contrast to the standard lazy 'L.Maybe' type, the strict
--- 'Maybe' type is not an applicative functor, and therefore also not a monad.
+-- 'Maybe' type does not have lawful 'Functor', 'Applicative', or 'Monad' instances.
+-- However, we provide instances for these type classes (and related others)
+-- since they are only partial due to the below example.
+--
 -- The problem is the /homomorphism/ law, which states that
 --
 --      @'pure' f '<*>' 'pure' x = 'pure' (f x)  -- must hold for all f@
@@ -17,6 +20,8 @@
 -- This law does not hold for the expected applicative functor instance of
 -- 'Maybe', as this instance does not satisfy @pure f \<*\> pure _|_ = pure (f
 -- _|_)@ for @f = const@.
+--
+-- This exception to the law is acceptable because we would expect a strict type to diverge on _|_ .
 --
 -----------------------------------------------------------------------------
 
@@ -35,8 +40,9 @@ module Data.Strict.Maybe (
 
 -- import parts explicitly, helps with compatibility
 import           Prelude (Functor (..), Eq (..), Ord (..), Show (..), Read (..), Bool (..), (.)
-                         ,error, Ordering (..), ($), showString, showParen, return, lex, readParen)
-import           Control.Applicative (pure, (<$>))
+                         ,error, Ordering (..), ($), showString, showParen, lex, readParen)
+import           Control.Applicative (Applicative (..), Alternative (..), (<$>))
+import           Control.Monad (Monad (..), MonadPlus (..))
 import           Data.Monoid (Monoid (..))
 import           Data.Semigroup (Semigroup (..))
 import           Data.Foldable (Foldable (..))
@@ -141,6 +147,37 @@ instance Foldable Maybe where
 instance Traversable Maybe where
     traverse _ Nothing  = pure Nothing
     traverse f (Just x) = Just <$> f x
+
+-- | Unlawful when given `Just _|_`, due to the homomorphism law
+instance Applicative Maybe where
+  -- thanks to https://hackage.haskell.org/package/base-4.19.1.0/docs/src/GHC.Base.html#line-1161
+  pure = Just
+
+  Just f  <*> m       = fmap f m
+  Nothing <*> _m      = Nothing
+
+  liftA2 f (Just x) (Just y) = Just (f x y)
+  liftA2 _ _ _ = Nothing
+
+  Just _m1 *> m2      = m2
+  Nothing  *> _m2     = Nothing
+
+instance Monad Maybe where
+  -- thanks to https://hackage.haskell.org/package/base-4.19.1.0/docs/src/GHC.Base.html#line-1161
+  (Just x) >>= k      = k x
+  Nothing  >>= _      = Nothing
+
+  (>>) = (*>)
+
+  return = pure
+
+instance Alternative Maybe where
+  -- thanks to https://hackage.haskell.org/package/base-4.19.1.0/docs/src/GHC.Base.html#line-1161
+  empty = Nothing
+  Nothing <|> r = r
+  l       <|> _ = l
+
+instance MonadPlus Maybe
 
 -- deepseq
 instance NFData a => NFData (Maybe a) where
