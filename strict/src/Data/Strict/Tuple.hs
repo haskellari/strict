@@ -121,7 +121,6 @@ instance (Semigroup a, Semigroup b) => Semigroup (Pair a b) where
 
 instance (Monoid a, Monoid b) => Monoid (Pair a b) where
   mempty                            = mempty :!: mempty
-  (x1 :!: y1) `mappend` (x2 :!: y2) = (x1 `mappend` x2) :!: (y1 `mappend` y2)
 
 -- deepseq
 instance (NFData a, NFData b) => NFData (Pair a b) where
